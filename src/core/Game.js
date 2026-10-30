@@ -80,8 +80,6 @@ PAM.Game = class Game {
     });
 
     await this.selectSong(this.song.id);
-    // warm up the other songs in the background so switching is instant
-    for (const s of PAM.Config.songs) if (s !== this.song) await this.loadSong(s);
   }
 
   playerFor(song) {
@@ -112,6 +110,12 @@ PAM.Game = class Game {
     const song = PAM.Config.songs.find(s => s.id === id) || PAM.Config.songs[0];
     if (this.run) this.stopRun();
     if (this.music && this.music !== this.playerFor(song)) this.music.stop();
+    // keep only the selected song's decoded audio in memory (a 3-minute song is ~70 MB decoded)
+    for (const s of PAM.Config.songs) {
+      if (s === song || this.loadState[s.id] !== 'ready') continue;
+      this.players[s.id].unload();
+      delete this.loadState[s.id]; delete this.loadState[s.id + ':p'];
+    }
     this.song = song;
     this.settings.songId = song.id; this.saveSettings();
     this.music = this.playerFor(song);

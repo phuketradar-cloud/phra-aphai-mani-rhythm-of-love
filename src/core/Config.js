@@ -24,6 +24,38 @@ PAM.Config = {
       audio: ['assets/music/bionic.mp3'],
       beatmap: 'assets/beatmaps/bionic.json',
       art: [418, 768, 340, 198]
+    },
+    {
+      id: 'ethereal_requiem',
+      title: 'Ethereal Requiem',
+      subtitle: 'บทเพลงไว้อาลัยแห่งวิญญาณ',
+      audio: ['assets/music/ethereal_requiem.mp3'],
+      beatmap: 'assets/beatmaps/ethereal_requiem.json',
+      art: [196, 752, 192, 198]
+    },
+    {
+      id: 'echoes_beyond_eternity',
+      title: 'Echoes Beyond Eternity',
+      subtitle: 'เสียงสะท้อนเหนือนิรันดร์',
+      audio: ['assets/music/echoes_beyond_eternity.mp3'],
+      beatmap: 'assets/beatmaps/echoes_beyond_eternity.json',
+      art: [18, 752, 174, 198]
+    },
+    {
+      id: 'celestial_storm',
+      title: 'Celestial Storm',
+      subtitle: 'พายุแห่งสรวงสวรรค์',
+      audio: ['assets/music/celestial_storm.mp3'],
+      beatmap: 'assets/beatmaps/celestial_storm.json',
+      art: [24, 395, 870, 320]
+    },
+    {
+      id: 'wings_of_the_forgotten',
+      title: 'Wings of the Forgotten',
+      subtitle: 'ปีกแห่งผู้ถูกลืม',
+      audio: ['assets/music/wings_of_the_forgotten.mp3'],
+      beatmap: 'assets/beatmaps/wings_of_the_forgotten.json',
+      art: [1022, 797, 188, 150]
     }
   ],
 

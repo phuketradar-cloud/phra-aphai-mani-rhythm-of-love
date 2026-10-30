@@ -67,11 +67,11 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
 /* ---------- song select ---------- */
 .song-panel { width: 1640px; }
 .song-layout { display: flex; gap: 30px; margin-top: 20px; }
-.song-list { flex: none; width: 360px; display: flex; flex-direction: column; gap: 12px; max-height: 720px; overflow-y: auto; }
-.song-item { text-align: left; padding: 16px 18px; border-radius: 14px; border: 1.5px solid rgba(160, 180, 220, .3); background: rgba(8, 16, 38, .8); color: var(--silver); cursor: pointer; font-family: var(--font-ui); }
-.song-item b { display: block; font: 700 26px var(--font-title); color: #fff; }
+.song-list { flex: none; width: 380px; display: flex; flex-direction: column; gap: 10px; max-height: 720px; overflow-y: auto; }
+.song-item { flex: none; text-align: left; padding: 12px 18px; border-radius: 14px; border: 1.5px solid rgba(160, 180, 220, .3); background: rgba(8, 16, 38, .8); color: var(--silver); cursor: pointer; font-family: var(--font-ui); }
+.song-item b { display: block; font: 700 23px var(--font-title); color: #fff; }
 .song-item span { display: block; font-size: 17px; color: var(--muted); margin-top: 2px; }
-.song-item em { display: block; font: 600 14px var(--font-title); letter-spacing: .1em; font-style: normal; color: var(--gold); margin-top: 8px; }
+.song-item em { display: block; font: 600 14px var(--font-title); letter-spacing: .1em; font-style: normal; color: var(--gold); margin-top: 4px; }
 .song-item.active { border-color: var(--gold); background: linear-gradient(160deg, rgba(80, 56, 20, .55), rgba(14, 22, 48, .9)); box-shadow: 0 0 24px rgba(227, 180, 92, .25); }
 .song-item:hover { border-color: var(--gold); }
 .song-card { flex: 1; display: flex; gap: 34px; }

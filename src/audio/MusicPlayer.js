@@ -60,6 +60,13 @@ PAM.MusicPlayer = class MusicPlayer {
     throw lastErr || new Error('No audio');
   }
 
+  /** Release the decoded audio (it is reloaded next time the song is selected). */
+  unload() {
+    this.stop();
+    if (this.element) { this.element.removeAttribute('src'); this.element.load(); }
+    this.buffer = null; this.element = null; this.mode = null;
+  }
+
   /** Load a user-picked File (works everywhere, including file://). */
   async loadFile(file) {
     this.audio.init();

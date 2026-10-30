@@ -89,8 +89,9 @@ PAM.UI = class UI {
       const r = PAM.Storage.getRecord(s.id, difficulty), st = state(s.id);
       const b = document.createElement('button');
       b.className = 'song-item' + (s === current ? ' active' : '');
-      const status = st === 'ready' ? (r.cleared ? 'CLEAR ✓' : r.highScore ? 'BEST ' + r.highScore.toLocaleString() : 'NEW')
-        : st === 'error' || st === 'nomap' ? 'โหลดไม่สำเร็จ' : 'กำลังโหลด…';
+      const status = st === 'error' || st === 'nomap' ? 'โหลดไม่สำเร็จ'
+        : st === 'loading' || (s === current && st !== 'ready') ? 'กำลังโหลด…'
+        : r.cleared ? 'CLEAR ✓' : r.highScore ? 'BEST ' + r.highScore.toLocaleString() : 'NEW';
       b.innerHTML = `<b>${s.title}</b><span>${s.subtitle}</span><em>${status}</em>`;
       b.addEventListener('click', () => { if (s !== current) { PAM.AudioManager.sfx.ui(); onSelect(s.id); } });
       list.appendChild(b);

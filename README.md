@@ -64,17 +64,26 @@ Pressing when no note is near is **not** punished. Holding a key never registers
 
 ## 4. The music and the beat maps
 
-Two songs are on the Song Selection screen. Each song has its own beat map and its own records:
+Six songs are on the Song Selection screen. Each song has its own beat map and its own records:
 
 | Song | File | Length | Pulse / felt BPM | Easy / Normal / Hard notes |
 |---|---|---|---|---|
 | Feltwood Requiem | `assets/music/Feltwood Requiem.wav` (48 kHz WAV) | 2:56 | 148 / 74 | 107 / 219 / 350 |
 | Bionic | `assets/music/bionic.mp3` (embedded tag title: "Whispers of the Void") | 3:28 | 137.2 / 68.6 | 148 / 259 / 455 |
+| Ethereal Requiem | `assets/music/ethereal_requiem.mp3` | 3:49 | 137.2 / 68.6 | 155 / 279 / 490 |
+| Echoes Beyond Eternity | `assets/music/echoes_beyond_eternity.mp3` | 3:54 | 137.2 / 68.6 | 139 / 267 / 479 |
+| Celestial Storm | `assets/music/celestial_storm.mp3` | 3:43 | 137.2 / 68.6 | 138 / 256 / 457 |
+| Wings of the Forgotten | `assets/music/wings_of_the_forgotten.mp3` | 3:59 | 137.2 / 68.6 | 151 / 291 / 512 |
 
-The audio is played unmodified: no resampling, pitch or tempo change. Bionic's map was made by the
-same analyzer running in the browser, because the Node tool only reads WAV. Its tempo had the same
-3:2 trap: 90.7 BPM looked plausible, and the onset check picked 137.2 (55% versus 30% of strong
-onsets).
+Minimum gaps between notes in every map: Easy ≥ 0.78 s, Normal ≥ 0.38 s, Hard ≥ 0.19 s.
+
+The audio is played unmodified: no resampling, pitch or tempo change. The MP3 maps were made by the
+same analyzer running in the browser (MP3 decoded at 48 kHz), because the Node tool only reads WAV.
+Every MP3 had the same 3:2 tempo trap: about 91 BPM looked plausible, and the onset check picked
+137.2 BPM, which lands on 49–56% of strong onsets versus 27–30%.
+
+Only the selected song's audio is decoded and kept in memory. Switching songs frees the previous
+one, because a decoded 4-minute song takes about 80 MB.
 
 The sections below describe Feltwood Requiem in detail.
 
@@ -228,8 +237,8 @@ Tested in the Chromium-based browser pane, served over http, on 2026-10-30:
   calibration test if hits feel early or late.
 * The in-browser analyzer can lock onto the weaker off-beat phase in some passages. The shipped
   chart was generated from the original 48 kHz WAV and sits on the stronger onsets.
-* The Bionic beat map was checked with the bot and against the waveform in the editor, but not
-  playtested by ear yet.
+* The MP3 beat maps were checked with the bot (Bionic and Celestial Storm played in the browser),
+  but none of them has been playtested by ear yet.
 * Not tested in Firefox or Safari. Desktop only, with no touch-screen tuning.
 * Google Fonts (Charm, Cinzel, Sarabun) load from the internet. Offline, the game falls back to
   Leelawadee UI or Tahoma.
