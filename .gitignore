@@ -1,0 +1,14 @@
+# build / packaging output
+*.zip
+dist/
+
+# editor and OS clutter
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# local tool settings
+.claude/
+node_modules/

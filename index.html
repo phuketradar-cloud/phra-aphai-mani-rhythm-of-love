@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phra Aphai Mani — Rhythm of Love</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Cinzel:wght@500;700;800&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/ui/style.css?v=2">
+</head>
+<body>
+<div id="viewport">
+ <div id="stage">
+  <canvas id="scene"></canvas>
+
+  <!-- ===================== HUD ===================== -->
+  <div id="hud" class="hidden">
+   <div class="hud-left">
+    <div class="hud-title">พระอภัยมณี <span>RHYTHM OF LOVE</span></div>
+    <div class="hud-stats">
+     <div class="stat wide"><label>SCORE</label><b id="hudScore">0000000</b></div>
+     <div class="stat"><label>COMBO</label><b id="hudCombo">0</b></div>
+     <div class="stat"><label>BEST</label><b id="hudBest">0</b></div>
+     <div class="stat"><label>ACC</label><b id="hudAcc">100%</b></div>
+    </div>
+   </div>
+   <div class="hud-progress"><div id="hudProgress"></div></div>
+   <div class="hud-right">
+    <div class="danger-head"><span>ผีเสื้อสมุทร · DANGER</span><b id="hudDangerPct">0%</b></div>
+    <div class="danger-bar"><div id="hudDanger"></div></div>
+    <div class="pursuit-status"><span id="hudStatus">นางยักษ์ต้องมนตร์เสียงขลุ่ย</span><em id="hudStatusEn">MESMERIZED</em></div>
+    <div class="distance">
+     <span class="dist-icon prince" title="พระอภัยมณี">♪</span>
+     <div class="dist-track"><div id="hudGiantIcon" class="dist-icon giant" title="ผีเสื้อสมุทร">♛</div></div>
+     <span class="dist-label" id="hudDistance">100 m</span>
+    </div>
+    <button class="icon-btn" id="btnPause" title="Pause (P / Esc)">❚❚</button>
+   </div>
+   <div id="hudSpell" class="spell"><label>มนตร์สะกด</label><div class="spell-bar"><div id="hudSpellFill"></div></div></div>
+  </div>
+
+  <div id="countdown" class="hidden"></div>
+  <div id="banner" class="hidden"></div>
+
+  <!-- ===================== MAIN MENU ===================== -->
+  <section class="screen" id="screen-menu">
+   <div class="menu-col">
+    <div class="eyebrow">A THAI FOLKLORE RHYTHM SURVIVAL GAME</div>
+    <h1 class="logo">พระอภัยมณี</h1>
+    <div class="logo-sub">— RHYTHM OF LOVE —</div>
+    <p class="tagline">เป่าปี่สะกดนางผีเสื้อสมุทร…<br>จังหวะที่ใช่ จะพาเขารอดพ้น</p>
+    <div class="menu-buttons">
+     <button class="btn primary" data-action="songs">▶ เริ่มเล่น <small>PLAY</small></button>
+     <button class="btn" data-action="tutorial">วิธีเล่น <small>TUTORIAL</small></button>
+     <button class="btn" data-action="settings">ตั้งค่า <small>SETTINGS</small></button>
+     <button class="btn" data-action="calibrate">ปรับจังหวะ <small>CALIBRATION</small></button>
+     <a class="btn" href="editor.html">ตัวแก้ไขโน้ต <small>BEAT MAP EDITOR</small></a>
+     <button class="btn" data-action="fullscreen">เต็มจอ <small>FULLSCREEN</small></button>
+    </div>
+    <p class="load-status" id="loadStatus">กำลังโหลดเพลง…</p>
+   </div>
+   <div class="menu-art">
+    <div class="crop" id="artBanner"></div>
+    <div class="art-caption">“เสียงปี่ของพระอภัยมณี คืออาวุธเดียวที่จะสะกดนางยักษ์ไว้ได้”</div>
+   </div>
+  </section>
+
+  <!-- ===================== SONG SELECT ===================== -->
+  <section class="screen hidden" id="screen-songs">
+   <div class="panel song-panel">
+    <div class="eyebrow">SONG SELECTION · เลือกเพลง</div>
+    <div class="song-layout">
+    <div class="song-list" id="songList"></div>
+    <div class="song-card">
+     <div class="crop song-art" id="artSong"></div>
+     <div class="song-info">
+      <h2 id="songTitle">Feltwood Requiem</h2>
+      <p class="muted" id="songSubtitle"></p>
+      <div class="song-meta" id="songMeta"></div>
+      <div class="diff-tabs" id="diffTabs"></div>
+      <p class="muted small" id="diffDesc"></p>
+      <div class="records" id="songRecords"></div>
+     </div>
+    </div>
+    </div>
+    <div class="audio-fallback hidden" id="audioFallback">
+     <p>เบราว์เซอร์ไม่อนุญาตให้โหลดไฟล์เพลงโดยตรง (เปิดผ่าน file://) — เลือกไฟล์เพลงของเพลงนี้จากโฟลเดอร์ assets/music หรือเปิดเกมด้วย <b>Play.bat</b></p>
+     <label class="btn small">เลือกไฟล์เพลง… <input type="file" id="musicFile" accept="audio/*" hidden></label>
+    </div>
+    <div class="row-buttons">
+     <button class="btn" data-action="menu">← กลับ <small>BACK</small></button>
+     <button class="btn primary" id="btnPlay" data-action="start" disabled>▶ บรรเลง <small>START</small></button>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===================== SETTINGS ===================== -->
+  <section class="screen hidden" id="screen-settings">
+   <div class="panel settings-panel">
+    <div class="eyebrow">SETTINGS · ตั้งค่า</div>
+    <div class="settings-grid">
+     <label>ระดับเสียงเพลง <small>Music volume</small></label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="musicVolume"><output></output></div>
+     <label>ระดับเสียงเอฟเฟกต์ <small>SFX volume</small></label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="sfxVolume"><output></output></div>
+     <label>ความยาก <small>Difficulty</small></label><div class="ctl"><select data-setting="difficulty"><option value="easy">ง่าย · EASY</option><option value="normal">ปกติ · NORMAL</option><option value="hard">ยาก · HARD</option></select></div>
+     <label>ความเร็วโน้ต <small>Note speed</small></label><div class="ctl"><input type="range" min="0.6" max="1.8" step="0.05" data-setting="noteSpeed"><output></output></div>
+     <label>ชดเชยจังหวะ <small>Timing calibration (ms)</small></label><div class="ctl"><input type="range" min="-200" max="200" step="1" data-setting="calibrationMs"><output></output><button class="btn small" data-action="calibrate">วัดอัตโนมัติ</button></div>
+     <label>สั่นหน้าจอ <small>Screen shake</small></label><div class="ctl"><input type="checkbox" data-setting="screenShake"></div>
+     <label>แสดง EARLY / LATE <small>Timing hints</small></label><div class="ctl"><input type="checkbox" data-setting="showEarlyLate"></div>
+     <label>เต็มจอ <small>Fullscreen</small></label><div class="ctl"><button class="btn small" data-action="fullscreen">สลับเต็มจอ (F)</button></div>
+    </div>
+    <div class="keys-help">
+     <h3>ปุ่มควบคุม · Controls</h3>
+     <ul>
+      <li><kbd>SPACE</kbd> <kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> หรือ <kbd>คลิกเมาส์</kbd> — เป่าปี่ (กดตามจังหวะ)</li>
+      <li><kbd>P</kbd> / <kbd>Esc</kbd> — หยุดชั่วคราว / เล่นต่อ</li>
+      <li><kbd>F</kbd> — เต็มจอ · <kbd>R</kbd> — เริ่มใหม่ (ระหว่างหยุด)</li>
+     </ul>
+    </div>
+    <div class="row-buttons"><button class="btn primary" data-action="back">← เสร็จสิ้น <small>DONE</small></button></div>
+   </div>
+  </section>
+
+  <!-- ===================== TUTORIAL ===================== -->
+  <section class="screen hidden" id="screen-tutorial">
+   <div class="panel tutorial-panel">
+    <div class="eyebrow">HOW TO PLAY · วิธีเล่น</div>
+    <div class="tut-steps">
+     <div class="tut">
+      <div class="tut-demo" id="tutDemo"><div class="tut-ring"></div><div class="tut-note"></div></div>
+      <h3>1 · กดตามจังหวะเพลง</h3>
+      <p>โน้ตเลื่อนจากขวามาซ้าย กด <kbd>SPACE</kbd> เมื่อโน้ตถึงวงแหวน<br>PERFECT ±50ms · GOOD ±100ms · OK ±150ms</p>
+     </div>
+     <div class="tut">
+      <div class="crop tut-art" id="artTut2"></div>
+      <h3>2 · กดพลาด = นางยักษ์ก้าวเข้ามา</h3>
+      <p>พลาด 1 ครั้ง นางก้าว 1 ก้าว · พลาดติดกัน นางจะเร่งเร็วขึ้น<br>พลาด 4 ครั้งขึ้นไป นางจะวิ่งไล่!</p>
+     </div>
+     <div class="tut">
+      <div class="crop tut-art" id="artTut3"></div>
+      <h3>3 · เล่นดีต่อเนื่อง = นางต้องมนตร์</h3>
+      <p>คอมโบยาวทำให้นางเคลิบเคลิ้มและถอยห่างออกไป<br>เอาตัวรอดจนจบเพลง = หลบหนีสำเร็จ</p>
+     </div>
+    </div>
+    <p class="muted small">โน้ตสี: <span class="dot c"></span> ปกติ <span class="dot b"></span> จังหวะย่อย <span class="dot g"></span> จังหวะหนัก (คะแนน ×1.5) <span class="dot r"></span> มนตร์ (คะแนน ×2) · กดปุ่มโดยไม่มีโน้ตจะไม่ถูกลงโทษ</p>
+    <div class="row-buttons">
+     <button class="btn" data-action="back">← กลับ <small>BACK</small></button>
+     <button class="btn primary" data-action="songs">▶ เริ่มเล่น <small>PLAY</small></button>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===================== CALIBRATION ===================== -->
+  <section class="screen hidden" id="screen-calibrate">
+   <div class="panel calib-panel">
+    <div class="eyebrow">TIMING CALIBRATION · ปรับจังหวะ</div>
+    <p>กด <b>เริ่มวัด</b> แล้วกด <kbd>SPACE</kbd> ให้ตรงกับเสียง “ติ๊ก” ทุกครั้ง (16 ครั้ง)<br>ระบบจะคำนวณว่าคุณกดเร็วหรือช้ากว่าเสียงโดยเฉลี่ยเท่าไร</p>
+    <div class="calib-visual"><div id="calibPulse"></div><div id="calibCount">—</div></div>
+    <p id="calibResult" class="calib-result">ค่าปัจจุบัน: 0 ms</p>
+    <div class="row-buttons">
+     <button class="btn" data-action="back">← กลับ <small>BACK</small></button>
+     <button class="btn" id="btnCalibStart">เริ่มวัด <small>START</small></button>
+     <button class="btn primary" id="btnCalibApply" disabled>ใช้ค่านี้ <small>APPLY</small></button>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===================== PAUSE ===================== -->
+  <section class="screen hidden dim" id="screen-pause">
+   <div class="panel pause-panel">
+    <div class="eyebrow">PAUSED</div>
+    <h2>พักหายใจ</h2>
+    <p class="muted">นางยักษ์หยุดรอชั่วคราว… เพลงจะเล่นต่อจากจุดเดิม</p>
+    <div class="settings-grid compact">
+     <label>เพลง <small>Music</small></label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="musicVolume"><output></output></div>
+     <label>เอฟเฟกต์ <small>SFX</small></label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="sfxVolume"><output></output></div>
+    </div>
+    <div class="col-buttons">
+     <button class="btn primary" data-action="resume">▶ เล่นต่อ <small>RESUME</small></button>
+     <button class="btn" data-action="retry">↻ เริ่มใหม่ <small>RETRY</small></button>
+     <button class="btn" data-action="songs">เลือกเพลง <small>SONG SELECTION</small></button>
+     <button class="btn" data-action="menu">เมนูหลัก <small>MAIN MENU</small></button>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===================== RESULTS ===================== -->
+  <section class="screen hidden dim" id="screen-results">
+   <div class="panel results-panel">
+    <div class="results-art crop" id="artResult"></div>
+    <div class="results-body">
+     <div class="eyebrow" id="resEyebrow">THE SEA CLAIMS ITS PRINCE</div>
+     <h1 id="resTitle">GAME OVER</h1>
+     <p id="resMsg" class="res-msg"></p>
+     <div class="res-score"><label>FINAL SCORE</label><b id="resScore">0</b><span id="resNew" class="badge hidden">NEW RECORD</span></div>
+     <div class="res-grid" id="resGrid"></div>
+     <div class="row-buttons">
+      <button class="btn primary" data-action="retry">↻ เล่นอีกครั้ง <small>RETRY</small></button>
+      <button class="btn" data-action="songs">เลือกเพลง <small>SONG SELECTION</small></button>
+      <button class="btn" data-action="menu">เมนูหลัก <small>MAIN MENU</small></button>
+     </div>
+    </div>
+   </div>
+  </section>
+ </div>
+</div>
+
+<!-- core -->
+<script src="src/core/Config.js?v=2"></script>
+<script src="src/core/Storage.js?v=2"></script>
+<script src="src/core/GameState.js?v=2"></script>
+<!-- audio -->
+<script src="src/audio/AudioManager.js?v=2"></script>
+<script src="src/audio/MusicPlayer.js?v=2"></script>
+<script src="src/audio/BeatAnalyzer.js?v=2"></script>
+<!-- rhythm -->
+<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=2"></script>
+<script src="assets/beatmaps/bionic.beatmap.js?v=2"></script>
+<script src="src/rhythm/BeatMap.js?v=2"></script>
+<script src="src/rhythm/Note.js?v=2"></script>
+<script src="src/rhythm/HitDetector.js?v=2"></script>
+<script src="src/rhythm/RhythmEngine.js?v=2"></script>
+<!-- gameplay -->
+<script src="src/gameplay/PursuitController.js?v=2"></script>
+<script src="src/gameplay/ScoreManager.js?v=2"></script>
+<script src="src/gameplay/DifficultyManager.js?v=2"></script>
+<!-- characters + rendering -->
+<script src="src/characters/Rig.js?v=2"></script>
+<script src="src/characters/PhraAphai.js?v=2"></script>
+<script src="src/characters/PhiSueaSamut.js?v=2"></script>
+<script src="src/render/Background.js?v=2"></script>
+<script src="src/render/Effects.js?v=2"></script>
+<script src="src/render/TrackRenderer.js?v=2"></script>
+<!-- ui + game -->
+<script src="src/ui/UI.js?v=2"></script>
+<script src="src/ui/Calibration.js?v=2"></script>
+<script src="src/core/Game.js?v=2"></script>
+<script>PAM.game = new PAM.Game(); PAM.game.boot();</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beat Map Editor — Rhythm of Love</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #070c1d; --panel: #0e1834; --line: #2a3a66; --gold: #e3b45c; --cyan: #5fe3ff; --text: #dfe6f5; --muted: #8fa0c4; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px 'Sarabun', 'Leelawadee UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+header { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #0a1228; flex-wrap: wrap; }
+header h1 { font-size: 18px; margin: 0 12px 0 0; color: var(--gold); }
+button, select, input[type=number] { font: 600 14px inherit; font-family: inherit; color: var(--text); background: #14214a; border: 1px solid var(--line); border-radius: 7px; padding: 6px 11px; }
+button { cursor: pointer; } button:hover { border-color: var(--gold); }
+button.primary { background: linear-gradient(135deg, #f0c873, #b07a2e); color: #1a1008; border-color: #f6d88c; }
+input[type=number] { width: 80px; }
+label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.group { display: flex; align-items: center; gap: 8px; padding-right: 12px; border-right: 1px solid var(--line); flex-wrap: wrap; }
+.group:last-child { border-right: 0; }
+#main { flex: 1; display: flex; min-height: 0; }
+#timelineWrap { flex: 1; position: relative; min-width: 0; }
+#timeline { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+aside { width: 320px; border-left: 1px solid var(--line); background: #0a1228; padding: 14px; overflow: auto; }
+aside h3 { margin: 14px 0 6px; font-size: 14px; color: var(--gold); letter-spacing: .05em; }
+aside p, aside li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+aside ul { padding-left: 18px; margin: 4px 0; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 14px; }
+.kv b { color: #fff; font-variant-numeric: tabular-nums; }
+#status { padding: 6px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; background: #0a1228; display: flex; justify-content: space-between; }
+#warn { color: #ff8aa0; }
+kbd { border: 1px solid #56688f; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: #fff; font-size: 12px; }
+#sel { min-height: 90px; }
+a { color: var(--cyan); }
+</style>
+</head>
+<body>
+<header>
+ <h1>🎼 Beat Map Editor</h1>
+ <div class="group"><label>Song <select id="selSong"></select></label></div>
+ <div class="group">
+  <button id="btnPlay" class="primary">▶ Play</button>
+  <button id="btnStop">■</button>
+  <label><input type="checkbox" id="chkTick" checked> Tick on notes</label>
+  <label><input type="checkbox" id="chkRecord"> Tap-record (<kbd>K</kbd>)</label>
+ </div>
+ <div class="group">
+  <label>BPM <input type="number" id="numBpm" step="0.01"></label>
+  <label>Offset <input type="number" id="numOffset" step="0.001"></label>
+  <label>Snap <select id="selSnap"><option value="0">off</option><option value="beats">detected beats</option><option value="1">grid 1/1</option><option value="2" selected>grid 1/2</option><option value="4">grid 1/4</option></select></label>
+  <label>Show <select id="selLevel"><option value="3">all levels</option><option value="2">≤ normal</option><option value="1">easy only</option></select></label>
+ </div>
+ <div class="group">
+  <button id="btnAnalyze">Analyze audio</button>
+  <button id="btnGenerate">Regenerate notes…</button>
+ </div>
+ <div class="group">
+  <button id="btnSave" class="primary">Save to game</button>
+  <button id="btnDownload">Download JSON</button>
+  <button id="btnDownloadJs">Download .beatmap.js</button>
+  <label class="btnlike"><button id="btnImport">Import JSON</button><input type="file" id="fileImport" accept=".json,application/json" hidden></label>
+  <button id="btnRevert">Revert to shipped</button>
+  <button id="btnPlaytest">Playtest from playhead ↗</button>
+  <a href="index.html">← Game</a>
+ </div>
+</header>
+<div id="main">
+ <div id="timelineWrap"><canvas id="timeline"></canvas></div>
+ <aside>
+  <h3>Song</h3>
+  <div class="kv" id="info"></div>
+  <p id="audioNote"></p>
+  <label id="pickAudio" style="display:none"><button onclick="document.getElementById('fileAudio').click()">Choose music file…</button><input type="file" id="fileAudio" accept="audio/*" hidden></label>
+  <h3>Selected note</h3>
+  <div id="sel"><p>Click a note to select it.</p></div>
+  <h3>Mouse &amp; keys</h3>
+  <ul>
+   <li>Click an empty spot in a row: <b>add</b> a note (row = difficulty).</li>
+   <li>Click a note: select · Drag: <b>move</b> · <kbd>Del</kbd>/right-click: <b>remove</b></li>
+   <li><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> set difficulty · <kbd>T</kbd> cycle type</li>
+   <li><kbd>←</kbd><kbd>→</kbd> nudge selected 5 ms (<kbd>Shift</kbd> 1 ms)</li>
+   <li><kbd>Space</kbd> play/pause · click the ruler: seek</li>
+   <li>Mouse wheel: scroll · <kbd>Ctrl</kbd>+wheel: zoom</li>
+   <li><kbd>K</kbd> while playing in tap-record mode: add a note at the playhead</li>
+   <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> undo</li>
+  </ul>
+  <h3>Saving</h3>
+  <p><b>Save to game</b> stores the map in this browser (the game loads it instead of the shipped file). To make it permanent, <b>Download JSON</b> and replace <code>assets/beatmaps/feltwood_requiem.json</code>, and <b>Download .beatmap.js</b> to replace the file:// copy next to it.</p>
+ </aside>
+</div>
+<div id="status"><span id="statusText">Loading…</span><span id="warn"></span></div>
+
+<script src="src/core/Config.js?v=2"></script>
+<script src="src/core/Storage.js?v=2"></script>
+<script src="src/audio/AudioManager.js?v=2"></script>
+<script src="src/audio/MusicPlayer.js?v=2"></script>
+<script src="src/audio/BeatAnalyzer.js?v=2"></script>
+<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=2"></script>
+<script src="assets/beatmaps/bionic.beatmap.js?v=2"></script>
+<script src="src/rhythm/BeatMap.js?v=2"></script>
+<script src="src/render/TrackRenderer.js?v=2"></script>
+<script src="src/editor/Editor.js?v=2"></script>
+<script>PAM.editor = new PAM.Editor(); PAM.editor.boot();</script>
+</body>
+</html>
