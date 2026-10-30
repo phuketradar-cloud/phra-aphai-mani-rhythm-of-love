@@ -108,8 +108,12 @@ PAM.AudioManager = (function () {
     const worker = async () => {
       while (jobs.length) {
         const s = jobs.shift();
-        try { const res = await fetch(encodeURI(s.url)); if (!res.ok) throw 0; s.buffer = await ctx.decodeAudioData(await res.arrayBuffer()); }
-        catch (e) { failed++; }
+        // one retry after a short pause: static hosts occasionally answer 503 right after a deploy
+        for (let attempt = 0; attempt < 2 && !s.buffer; attempt++) {
+          try { const res = await fetch(encodeURI(s.url)); if (!res.ok) throw 0; s.buffer = await ctx.decodeAudioData(await res.arrayBuffer()); }
+          catch (e) { if (attempt === 0) await new Promise(r => setTimeout(r, 800)); }
+        }
+        if (!s.buffer) failed++;
         done++; if (onProgress) onProgress(done);
       }
     };
