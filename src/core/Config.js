@@ -56,6 +56,14 @@ PAM.Config = {
       audio: ['assets/music/wings_of_the_forgotten.mp3'],
       beatmap: 'assets/beatmaps/wings_of_the_forgotten.json',
       art: [1022, 797, 188, 150]
+    },
+    {
+      id: 'mermaids_lament',
+      title: "The Mermaid's Lament",
+      subtitle: 'เพลงคร่ำครวญของนางเงือก',
+      audio: ['assets/music/mermaids_lament.mp3'],
+      beatmap: 'assets/beatmaps/mermaids_lament.json',
+      art: [1276, 384, 244, 244]
     }
   ],
 

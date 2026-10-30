@@ -64,7 +64,7 @@ Pressing when no note is near is **not** punished. Holding a key never registers
 
 ## 4. The music and the beat maps
 
-Six songs are on the Song Selection screen. Each song has its own beat map and its own records:
+Seven songs are on the Song Selection screen. Each song has its own beat map and its own records:
 
 | Song | File | Length | Pulse / felt BPM | Easy / Normal / Hard notes |
 |---|---|---|---|---|
@@ -74,13 +74,14 @@ Six songs are on the Song Selection screen. Each song has its own beat map and i
 | Echoes Beyond Eternity | `assets/music/echoes_beyond_eternity.mp3` | 3:54 | 137.2 / 68.6 | 139 / 267 / 479 |
 | Celestial Storm | `assets/music/celestial_storm.mp3` | 3:43 | 137.2 / 68.6 | 138 / 256 / 457 |
 | Wings of the Forgotten | `assets/music/wings_of_the_forgotten.mp3` | 3:59 | 137.2 / 68.6 | 151 / 291 / 512 |
+| The Mermaid's Lament | `assets/music/mermaids_lament.mp3` | 5:54 | 140.6 / 70.3 | 226 / 419 / 602 |
 
 Minimum gaps between notes in every map: Easy ≥ 0.78 s, Normal ≥ 0.38 s, Hard ≥ 0.19 s.
 
 The audio is played unmodified: no resampling, pitch or tempo change. The MP3 maps were made by the
 same analyzer running in the browser (MP3 decoded at 48 kHz), because the Node tool only reads WAV.
-Every MP3 had the same 3:2 tempo trap: about 91 BPM looked plausible, and the onset check picked
-137.2 BPM, which lands on 49–56% of strong onsets versus 27–30%.
+Every MP3 had the same 3:2 tempo trap: about 91–94 BPM looked plausible, and the onset check picked
+the faster pulse (137.2 or 140.6 BPM), which lands on 49–68% of strong onsets versus 27–33%.
 
 Only the selected song's audio is decoded and kept in memory. Switching songs frees the previous
 one, because a decoded 4-minute song takes about 80 MB.
