@@ -23,6 +23,7 @@ PAM.Editor = class Editor {
     this.undoStack = [];
     this.tickedUntil = 0;
     this.RULER = 30;
+    this.lane = 0;               // lane for new notes (W)
   }
 
   async boot() {
@@ -75,6 +76,8 @@ PAM.Editor = class Editor {
   xToTime(x) { return this.viewStart + x / this.pxPerSec; }
   rowAt(y) { return y < this.rowsTop ? 0 : Math.min(3, 1 + Math.floor((y - this.rowsTop) / this.rowH)); }
   rowY(level) { return this.rowsTop + (level - 0.5) * this.rowH; }
+  /** Inside a difficulty row, lanes W/A/S/D are stacked top to bottom. */
+  noteY(n) { return this.rowY(n.difficulty) + ((n.lane || 0) - 1.5) * this.rowH * 0.2; }
   get duration() { return this.music.duration || this.map.duration || 180; }
 
   snap(t) {
@@ -94,10 +97,10 @@ PAM.Editor = class Editor {
   noteAt(x, y) {
     const row = this.rowAt(y);
     if (!row) return null;
-    let best = null, bd = 10;
+    let best = null, bd = 12;
     for (const n of this.map.notes) {
       if (n.difficulty !== row) continue;
-      const d = Math.abs(this.timeToX(n.time) - x);
+      const d = Math.abs(this.timeToX(n.time) - x) + Math.abs(this.noteY(n) - y) * 0.6;
       if (d < bd) { bd = d; best = n; }
     }
     return best;
@@ -109,11 +112,11 @@ PAM.Editor = class Editor {
   sortNotes() { this.map.notes.sort((a, b) => a.time - b.time); }
   changed(msg) { this.sortNotes(); this.dirty = true; this.updateInfo(); this.updateSel(); if (msg) this.status(msg); }
 
-  addNote(t, level) {
+  addNote(t, level, lane) {
     this.pushUndo();
-    const n = { time: +t.toFixed(3), lane: 0, type: 'normal', difficulty: level, window: 1, fx: null };
+    const n = { time: +t.toFixed(3), lane: lane === undefined ? this.lane : lane, type: 'normal', difficulty: level, window: 1, fx: null, duration: 0, chord: 0, accent: false };
     this.map.notes.push(n); this.selected = n;
-    this.changed(`Added note at ${n.time.toFixed(3)} s (level ${level})`);
+    this.changed(`Added ${'WASD'[n.lane]} note at ${n.time.toFixed(3)} s (level ${level})`);
   }
   removeNote(n) {
     this.pushUndo();
@@ -160,13 +163,26 @@ PAM.Editor = class Editor {
       if (e.target.tagName === 'INPUT' && e.target.type === 'number') return;
       const n = this.selected;
       if (e.code === 'Space') { e.preventDefault(); this.togglePlay(); }
-      else if (e.code === 'KeyK' && this.music.playing && this.$('chkRecord').checked) {
-        const t = this.music.timeAt(performance.now()) - PAM.Storage.loadSettings().calibrationMs / 1000;
-        this.addNote(this.snap(t), parseInt(this.$('selLevel').value, 10) === 1 ? 1 : 2);
+      else if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code) && !e.repeat) {
+        const lane = ['KeyW', 'KeyA', 'KeyS', 'KeyD'].indexOf(e.code);
+        if (this.music.playing && this.$('chkRecord').checked) {
+          // tap-record: each lane key records a note in that lane at the playhead
+          const t = this.music.timeAt(performance.now()) - PAM.Storage.loadSettings().calibrationMs / 1000;
+          this.addNote(this.snap(t), parseInt(this.$('selLevel').value, 10) === 1 ? 1 : 2, lane);
+        } else if (n) { this.pushUndo(); n.lane = lane; this.changed('Lane: ' + 'WASD'[lane]); }
+        else { this.lane = lane; this.status('New notes go to lane ' + 'WASD'[lane]); }
       }
+      else if (e.code === 'KeyH' && n) {
+        this.pushUndo();
+        if (n.type === 'hold') { n.type = 'normal'; n.duration = 0; } else { n.type = 'hold'; n.duration = n.duration || 0.5; }
+        this.changed(n.type === 'hold' ? 'Hold note (' + n.duration + ' s) - [ ] to change length' : 'Normal note');
+      }
+      else if ((e.code === 'BracketLeft' || e.code === 'BracketRight') && n && n.type === 'hold') {
+        this.pushUndo(); n.duration = Math.max(0.2, +(n.duration + (e.code === 'BracketLeft' ? -0.05 : 0.05)).toFixed(2)); this.changed('Hold length ' + n.duration + ' s');
+      }
+      else if (e.code === 'KeyX' && n) { this.pushUndo(); n.accent = !n.accent; this.changed(n.accent ? 'Strong beat (x1.5)' : 'Normal strength'); }
       else if ((e.code === 'Delete' || e.code === 'Backspace') && n) { e.preventDefault(); this.removeNote(n); }
       else if (['Digit1', 'Digit2', 'Digit3'].includes(e.code) && n) { this.pushUndo(); n.difficulty = +e.code.slice(-1); this.changed('Difficulty set to ' + n.difficulty); }
-      else if (e.code === 'KeyT' && n) { this.pushUndo(); const types = ['normal', 'soft', 'accent', 'spell']; n.type = types[(types.indexOf(n.type) + 1) % 4]; this.changed('Type: ' + n.type); }
       else if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && n) {
         e.preventDefault(); this.pushUndo();
         n.time = +(n.time + (e.code === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 0.001 : 0.005)).toFixed(3); this.changed('Nudged to ' + n.time.toFixed(3));
@@ -271,10 +287,14 @@ PAM.Editor = class Editor {
     delete m.source;
     m.notes = this.map.notes.map(n => {
       const o = { time: +n.time.toFixed(3), lane: n.lane || 0, type: n.type, difficulty: n.difficulty };
+      if (n.type === 'hold') o.duration = n.duration;
+      if (n.chord) o.chord = n.chord;
+      if (n.accent) o.accent = true;
       if (n.window && n.window !== 1) o.window = n.window;
       if (n.fx) o.fx = n.fx;
       return o;
     });
+    m.format = 2;
     m.editedAt = new Date().toISOString();
     return m;
   }
@@ -301,7 +321,8 @@ PAM.Editor = class Editor {
     this.tooClose = new Set();
     for (const L of [1, 2, 3]) {
       const v = notes.filter(n => n.difficulty <= L);
-      for (let i = 1; i < v.length; i++) if (v[i].time - v[i - 1].time < minGapRule[L]) { this.tooClose.add(v[i]); this.tooClose.add(v[i - 1]); }
+      // chords share a timestamp on purpose: only distinct times count as too close
+      for (let i = 1; i < v.length; i++) { const gap = v[i].time - v[i - 1].time; if (gap > 0.001 && gap < minGapRule[L]) { this.tooClose.add(v[i]); this.tooClose.add(v[i - 1]); } }
     }
     this.$('warn').textContent = this.tooClose.size ? `⚠ ${this.tooClose.size} notes are very close together (outlined red)` : '';
     const d = this.duration;
@@ -340,7 +361,7 @@ PAM.Editor = class Editor {
       const when = this.music.startAt + n.time;
       if (when < ctx.currentTime) continue;
       const o = ctx.createOscillator(), g = ctx.createGain();
-      o.frequency.value = n.type === 'accent' || n.type === 'spell' ? 1760 : 1320;
+      o.frequency.value = [1320, 1100, 880, 1568][n.lane || 0] * (n.accent ? 1.25 : 1);
       g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(0.18, when + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
       o.connect(g); g.connect(ctx.destination); o.start(when); o.stop(when + 0.06);
     }
@@ -407,14 +428,17 @@ PAM.Editor = class Editor {
     const level = parseInt(this.$('selLevel').value, 10);
     for (const n of this.map.notes) {
       if (n.time < t0 - 0.1 || n.time > t1 + 0.1) continue;
-      const x = this.timeToX(n.time), y = this.rowY(n.difficulty), dim = n.difficulty > level;
-      const size = n.type === 'accent' || n.type === 'spell' ? 9 : n.type === 'soft' ? 6 : 7.5;
-      c.save(); c.translate(x, y); c.globalAlpha = dim ? 0.25 : 1;
-      c.strokeStyle = 'rgba(255,255,255,0.15)'; c.beginPath(); c.moveTo(0, -this.rowH / 2 + 4); c.lineTo(0, this.rowH / 2 - 4); c.stroke();
-      c.rotate(Math.PI / 4); c.fillStyle = PAM.TrackRenderer.colorFor(n.type); c.fillRect(-size, -size, size * 2, size * 2);
+      const x = this.timeToX(n.time), y = this.noteY(n), dim = n.difficulty > level;
+      const size = n.accent ? 9 : n.type === 'stream' ? 6 : 7.5, col = PAM.TrackRenderer.laneColor(n.lane || 0);
+      c.save(); c.globalAlpha = dim ? 0.25 : 1;
+      if (n.type === 'hold') { c.fillStyle = col + '66'; c.fillRect(x, y - 4, n.duration * this.pxPerSec, 8); }
+      c.translate(x, y);
+      c.rotate(Math.PI / 4); c.fillStyle = col; c.fillRect(-size, -size, size * 2, size * 2);
+      if (n.chord) { c.strokeStyle = '#f6d88c'; c.lineWidth = 1.5; c.strokeRect(-size - 1.5, -size - 1.5, size * 2 + 3, size * 2 + 3); }
       if (n === this.selected) { c.strokeStyle = '#fff'; c.lineWidth = 2.5; c.strokeRect(-size - 4, -size - 4, size * 2 + 8, size * 2 + 8); }
       else if (this.tooClose && this.tooClose.has(n)) { c.strokeStyle = '#ff3355'; c.lineWidth = 2; c.strokeRect(-size - 3, -size - 3, size * 2 + 6, size * 2 + 6); }
-      c.restore();
+      c.rotate(-Math.PI / 4); c.fillStyle = '#0a1028'; c.font = '700 9px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('WASD'[n.lane || 0], 0, 0.5);
+      c.restore(); c.textAlign = 'left'; c.textBaseline = 'alphabetic';
     }
 
     // ruler

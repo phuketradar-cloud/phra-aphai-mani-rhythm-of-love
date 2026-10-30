@@ -29,23 +29,41 @@ PAM.BeatMap = {
   },
 
   normalize(map) {
-    const notes = (map.notes || [])
-      .filter(n => typeof n.time === 'number' && isFinite(n.time))
+    let raw = (map.notes || []).filter(n => typeof n.time === 'number' && isFinite(n.time));
+    // one-key (format 1) maps, e.g. an old editor override, are upgraded to four lanes on load
+    if (map.format !== 2 && !raw.some(n => n.lane > 0) && PAM.BeatAnalyzer) {
+      raw = PAM.BeatAnalyzer.toFourLane(raw, PAM.BeatAnalyzer.hashSeed(map.id || map.song || 'song'));
+    }
+    const notes = raw
       .map(n => ({
         time: n.time,
-        lane: n.lane || 0,
+        lane: Math.max(0, Math.min(3, n.lane || 0)),
         type: n.type || 'normal',
         difficulty: n.difficulty || 1,
+        duration: n.type === 'hold' ? Math.max(0.2, n.duration || 0.5) : 0,
+        chord: n.chord || 0,
+        accent: !!n.accent,
         window: n.window || 1,
         fx: n.fx || null
       }))
-      .sort((a, b) => a.time - b.time);
-    return Object.assign({}, map, { notes });
+      .sort((a, b) => a.time - b.time || a.lane - b.lane);
+    return Object.assign({}, map, { format: 2, notes });
   },
 
-  /** Notes for one difficulty level (1..3). */
+  /**
+   * Notes for one difficulty level (1..3), with `kind` = what the player sees at this level:
+   * a chord whose partner notes are hidden at this difficulty becomes a normal note again.
+   */
   notesFor(map, level) {
-    return map.notes.filter(n => n.difficulty <= level);
+    const notes = map.notes.filter(n => n.difficulty <= level).map(n => Object.assign({}, n));
+    const groups = {};
+    for (const n of notes) if (n.chord) (groups[n.chord] = groups[n.chord] || []).push(n);
+    for (const n of notes) {
+      const size = n.chord ? groups[n.chord].length : 1;
+      n.chordSize = size;
+      n.kind = size >= 3 ? 'chord' : size === 2 ? 'double' : n.type === 'double' || n.type === 'chord' ? 'normal' : n.type;
+    }
+    return notes;
   },
 
   countFor(map, level) { return this.notesFor(map, level).length; },

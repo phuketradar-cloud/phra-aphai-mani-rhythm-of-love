@@ -1,0 +1,141 @@
+{
+ "version": 1,
+ "voice": {
+  "celebrate": [
+   "assets/audio/voice/celebrate/celebrate_0_0.wav",
+   "assets/audio/voice/celebrate/celebrate_0_1.wav",
+   "assets/audio/voice/celebrate/celebrate_0_2.wav",
+   "assets/audio/voice/celebrate/celebrate_1_0.wav",
+   "assets/audio/voice/celebrate/celebrate_1_1.wav",
+   "assets/audio/voice/celebrate/celebrate_1_2.wav",
+   "assets/audio/voice/celebrate/celebrate_2_0.wav",
+   "assets/audio/voice/celebrate/celebrate_2_1.wav",
+   "assets/audio/voice/celebrate/celebrate_2_2.wav"
+  ],
+  "good": [
+   "assets/audio/voice/good/good_0_0.wav",
+   "assets/audio/voice/good/good_0_1.wav",
+   "assets/audio/voice/good/good_0_2.wav",
+   "assets/audio/voice/good/good_1_0.wav",
+   "assets/audio/voice/good/good_1_1.wav",
+   "assets/audio/voice/good/good_1_2.wav",
+   "assets/audio/voice/good/good_2_0.wav",
+   "assets/audio/voice/good/good_2_1.wav",
+   "assets/audio/voice/good/good_2_2.wav",
+   "assets/audio/voice/good/good_3_0.wav",
+   "assets/audio/voice/good/good_3_1.wav",
+   "assets/audio/voice/good/good_3_2.wav"
+  ],
+  "miss": [
+   "assets/audio/voice/miss/miss_0_0.wav",
+   "assets/audio/voice/miss/miss_0_1.wav",
+   "assets/audio/voice/miss/miss_0_2.wav",
+   "assets/audio/voice/miss/miss_1_0.wav",
+   "assets/audio/voice/miss/miss_1_1.wav",
+   "assets/audio/voice/miss/miss_1_2.wav",
+   "assets/audio/voice/miss/miss_2_0.wav",
+   "assets/audio/voice/miss/miss_2_1.wav",
+   "assets/audio/voice/miss/miss_2_2.wav",
+   "assets/audio/voice/miss/miss_3_0.wav",
+   "assets/audio/voice/miss/miss_3_1.wav",
+   "assets/audio/voice/miss/miss_3_2.wav",
+   "assets/audio/voice/miss/miss_4_0.wav",
+   "assets/audio/voice/miss/miss_4_1.wav",
+   "assets/audio/voice/miss/miss_4_2.wav"
+  ],
+  "perfect": [
+   "assets/audio/voice/perfect/perfect_0_0.wav",
+   "assets/audio/voice/perfect/perfect_0_1.wav",
+   "assets/audio/voice/perfect/perfect_0_2.wav",
+   "assets/audio/voice/perfect/perfect_1_0.wav",
+   "assets/audio/voice/perfect/perfect_1_1.wav",
+   "assets/audio/voice/perfect/perfect_1_2.wav",
+   "assets/audio/voice/perfect/perfect_2_0.wav",
+   "assets/audio/voice/perfect/perfect_2_1.wav",
+   "assets/audio/voice/perfect/perfect_2_2.wav",
+   "assets/audio/voice/perfect/perfect_3_0.wav",
+   "assets/audio/voice/perfect/perfect_3_1.wav",
+   "assets/audio/voice/perfect/perfect_3_2.wav",
+   "assets/audio/voice/perfect/perfect_4_0.wav",
+   "assets/audio/voice/perfect/perfect_4_1.wav",
+   "assets/audio/voice/perfect/perfect_4_2.wav"
+  ],
+  "streak": [
+   "assets/audio/voice/streak/streak_0_0.wav",
+   "assets/audio/voice/streak/streak_0_1.wav",
+   "assets/audio/voice/streak/streak_0_2.wav",
+   "assets/audio/voice/streak/streak_1_0.wav",
+   "assets/audio/voice/streak/streak_1_1.wav",
+   "assets/audio/voice/streak/streak_1_2.wav",
+   "assets/audio/voice/streak/streak_2_0.wav",
+   "assets/audio/voice/streak/streak_2_1.wav",
+   "assets/audio/voice/streak/streak_2_2.wav",
+   "assets/audio/voice/streak/streak_3_0.wav",
+   "assets/audio/voice/streak/streak_3_1.wav",
+   "assets/audio/voice/streak/streak_3_2.wav"
+  ],
+  "worried": [
+   "assets/audio/voice/worried/worried_0_0.wav",
+   "assets/audio/voice/worried/worried_0_1.wav",
+   "assets/audio/voice/worried/worried_0_2.wav",
+   "assets/audio/voice/worried/worried_1_0.wav",
+   "assets/audio/voice/worried/worried_1_1.wav",
+   "assets/audio/voice/worried/worried_1_2.wav",
+   "assets/audio/voice/worried/worried_2_0.wav",
+   "assets/audio/voice/worried/worried_2_1.wav",
+   "assets/audio/voice/worried/worried_2_2.wav"
+  ]
+ },
+ "crowd": {
+  "applause_large": [
+   "assets/audio/crowd/applause_large/applause_large_0.wav",
+   "assets/audio/crowd/applause_large/applause_large_1.wav"
+  ],
+  "applause_medium": [
+   "assets/audio/crowd/applause_medium/applause_medium_0.wav",
+   "assets/audio/crowd/applause_medium/applause_medium_1.wav"
+  ],
+  "applause_small": [
+   "assets/audio/crowd/applause_small/applause_small_0.wav",
+   "assets/audio/crowd/applause_small/applause_small_1.wav"
+  ],
+  "boo": [
+   "assets/audio/crowd/boo/boo_0.wav",
+   "assets/audio/crowd/boo/boo_1.wav"
+  ],
+  "celebration": [
+   "assets/audio/crowd/celebration/celebration_0.wav",
+   "assets/audio/crowd/celebration/celebration_1.wav"
+  ],
+  "cheer_large": [
+   "assets/audio/crowd/cheer_large/cheer_large_0.wav",
+   "assets/audio/crowd/cheer_large/cheer_large_1.wav"
+  ],
+  "cheer_small": [
+   "assets/audio/crowd/cheer_small/cheer_small_0.wav",
+   "assets/audio/crowd/cheer_small/cheer_small_1.wav",
+   "assets/audio/crowd/cheer_small/cheer_small_2.wav"
+  ],
+  "gasp": [
+   "assets/audio/crowd/gasp/gasp_0.wav",
+   "assets/audio/crowd/gasp/gasp_1.wav"
+  ],
+  "groan": [
+   "assets/audio/crowd/groan/groan_0.wav",
+   "assets/audio/crowd/groan/groan_1.wav"
+  ],
+  "murmur": [
+   "assets/audio/crowd/murmur/murmur_0.wav",
+   "assets/audio/crowd/murmur/murmur_1.wav"
+  ],
+  "whistle": [
+   "assets/audio/crowd/whistle/whistle_0.wav",
+   "assets/audio/crowd/whistle/whistle_1.wav",
+   "assets/audio/crowd/whistle/whistle_2.wav",
+   "assets/audio/crowd/whistle/whistle_3.wav"
+  ],
+  "worried": [
+   "assets/audio/crowd/worried/worried_0.wav"
+  ]
+ }
+}

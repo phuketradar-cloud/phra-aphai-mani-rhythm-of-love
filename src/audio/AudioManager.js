@@ -1,25 +1,45 @@
 /*
- * AudioManager — owns the AudioContext, the music / SFX buses and all sound effects.
- * Sound effects are synthesized (no extra files needed) and mixed under the music:
- * they are short, filtered and quiet so the supplied soundtrack stays in front.
+ * AudioManager — the AudioContext, the mixer, the sample player and the synthesized effects.
  *
- *   music source -> musicFilter (lowpass, used for the underwater effect) -> musicGain -> master
- *   sfx voices   -> sfxGain -> master
+ * Mixer (every channel has a user volume and a separate ducking stage, smooth ramps only):
+ *
+ *   music      (song; lowpass for the underwater effect) ┐
+ *   flute      (hit accents, misses, countdown, UI)       │
+ *   voice      (vocal feedback samples)                   │   channel gain (user volume)
+ *   crowdAmb   (murmur / worried loops)                   ├─> duck gain (ducking)
+ *   crowdReact (applause, cheers, whistles, gasps, boos)  │   ─> master ─> limiter ─> output
+ *   footsteps  (giantess steps)                           │
+ *   danger     (heartbeat, roar, grab, splash, impact)    ┘
+ *
+ * The music always stays the primary focus: ducking only dips it slightly (≈ -1.5 dB) and the
+ * master limiter (DynamicsCompressor) prevents clipping when many layers sound together.
  */
 window.PAM = window.PAM || {};
 PAM.AudioManager = (function () {
-  let ctx = null, master, musicGain, musicFilter, sfxGain, noiseBuf;
+  const CHANNELS = ['music', 'flute', 'voice', 'crowdAmb', 'crowdReact', 'footsteps', 'danger'];
+  let ctx = null, master, limiter, musicFilter, noiseBuf;
+  const ch = {};          // name -> { gain, duck }
+  const samples = {};     // "group/category" -> [{ url, buffer }]
   let clockOffset = null; // smoothed (contextTime - performanceTime) in seconds
+  let packMode = 'none';  // 'webaudio' | 'element' (file:// fallback) | 'none'
   const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.5];
 
   function init() {
     if (ctx) return ctx;
     const AC = window.AudioContext || window.webkitAudioContext;
     ctx = new AC({ latencyHint: 'interactive' });
-    master = ctx.createGain(); master.gain.value = 1; master.connect(ctx.destination);
+    limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -6; limiter.knee.value = 6; limiter.ratio.value = 12;
+    limiter.attack.value = 0.003; limiter.release.value = 0.2;
+    master = ctx.createGain(); master.gain.value = 1;
+    master.connect(limiter); limiter.connect(ctx.destination);
+    for (const name of CHANNELS) {
+      const gain = ctx.createGain(), duck = ctx.createGain();
+      gain.connect(duck); duck.connect(master);
+      ch[name] = { gain, duck };
+    }
     musicFilter = ctx.createBiquadFilter(); musicFilter.type = 'lowpass'; musicFilter.frequency.value = 22000; musicFilter.Q.value = 0.7;
-    musicGain = ctx.createGain(); musicFilter.connect(musicGain); musicGain.connect(master);
-    sfxGain = ctx.createGain(); sfxGain.connect(master);
+    musicFilter.connect(ch.music.gain);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -45,62 +65,178 @@ PAM.AudioManager = (function () {
   }
   function resetClock() { clockOffset = null; }
 
+  // ------------------------------------------------------------------ mixer
+  const volumes = {};
+  function setChannelVolume(name, v) {
+    volumes[name] = v;
+    init();
+    if (ch[name]) ch[name].gain.gain.setTargetAtTime(v, ctx.currentTime, 0.03);
+  }
+  /**
+   * Temporarily lower channels: levels = { music: 0.85, crowdAmb: 0.5 }. Smooth attack/release.
+   * Overlapping ducks keep the deepest level until the longest one ends.
+   */
+  const duckState = {};
+  function duck(levels, holdSec, attack = 0.08, release = 0.6) {
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    for (const name in levels) {
+      const c = ch[name]; if (!c) continue;
+      const st = duckState[name] || { level: 1, until: 0 };
+      const level = now < st.until ? Math.min(st.level, levels[name]) : levels[name];
+      const until = Math.max(st.until, now + holdSec);
+      duckState[name] = { level, until };
+      const g = c.duck.gain;
+      g.cancelScheduledValues(now);
+      g.setTargetAtTime(level, now, attack / 3);
+      g.setTargetAtTime(1, until, release / 3);
+    }
+  }
+  function resetDucking() { if (!ctx) return; for (const name of CHANNELS) { ch[name].duck.gain.cancelScheduledValues(ctx.currentTime); ch[name].duck.gain.setTargetAtTime(1, ctx.currentTime, 0.05); delete duckState[name]; } }
+
+  // ------------------------------------------------------------------ sample pack
+  /** Load every sample listed in a manifest ({voice:{cat:[urls]}, crowd:{cat:[urls]}}). */
+  async function loadPack(manifest, onProgress) {
+    init();
+    const jobs = [];
+    for (const group of ['voice', 'crowd']) for (const cat in (manifest[group] || {})) {
+      const key = group + '/' + cat;
+      samples[key] = manifest[group][cat].map(url => ({ url, buffer: null }));
+      for (const s of samples[key]) jobs.push(s);
+    }
+    let done = 0, failed = 0;
+    const worker = async () => {
+      while (jobs.length) {
+        const s = jobs.shift();
+        try { const res = await fetch(encodeURI(s.url)); if (!res.ok) throw 0; s.buffer = await ctx.decodeAudioData(await res.arrayBuffer()); }
+        catch (e) { failed++; }
+        done++; if (onProgress) onProgress(done);
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    packMode = failed === 0 ? 'webaudio' : done > failed ? 'webaudio' : 'element';
+    return { files: done, failed, mode: packMode };
+  }
+  function sampleList(key) { return samples[key] || []; }
+
+  /**
+   * Play a sample on a channel. opts: { gain, rate, pan, width (0..1 Haas widening), offset, loop, fadeIn }
+   * Returns a handle { duration, stop(fadeSec), setGain(v, sec) } or null.
+   */
+  function play(sample, channel, opts = {}) {
+    if (!sample || !ctx) return null;
+    const o = Object.assign({ gain: 1, rate: 1, pan: 0, width: 0, loop: false, fadeIn: 0.005 }, opts);
+    if (!sample.buffer) {
+      // file:// fallback: a plain <audio> element (no ducking / panning possible there)
+      if (o.loop && !sample.url) return null;
+      const el = new Audio(encodeURI(sample.url));
+      el.volume = Math.max(0, Math.min(1, o.gain * (volumes[channel] !== undefined ? volumes[channel] : 1)));
+      el.loop = o.loop; el.playbackRate = o.rate;
+      el.play().catch(() => {});
+      return { duration: 2, stop() { el.pause(); }, setGain(v) { el.volume = Math.max(0, Math.min(1, v * (volumes[channel] || 1))); } };
+    }
+    const now = ctx.currentTime;
+    const src = ctx.createBufferSource(); src.buffer = sample.buffer; src.playbackRate.value = o.rate; src.loop = o.loop;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, o.gain), now + Math.max(0.005, o.fadeIn));
+    src.connect(g);
+    let out = g;
+    if (ctx.createStereoPanner) {
+      const p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, o.pan)); g.connect(p); out = p;
+    }
+    out.connect(ch[channel].gain);
+    if (o.width > 0 && ctx.createStereoPanner) {
+      // Haas widening: a slightly delayed copy on the opposite side makes mono crowd layers feel wide
+      const dl = ctx.createDelay(0.05); dl.delayTime.value = 0.012 + Math.random() * 0.01;
+      const p2 = ctx.createStereoPanner(); p2.pan.value = -Math.sign(o.pan || 0.3) * 0.8;
+      const g2 = ctx.createGain(); g2.gain.value = o.width * 0.7;
+      g.connect(dl); dl.connect(g2); g2.connect(p2); p2.connect(ch[channel].gain);
+    }
+    src.start(now, o.offset || 0);
+    const dur = sample.buffer.duration / o.rate;
+    return {
+      duration: dur, source: src,
+      stop(fade = 0.15) { const t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0.0001, t, fade / 3); try { src.stop(t + fade + 0.05); } catch (e) { /* stopped */ } },
+      setGain(v, sec = 0.5) { g.gain.cancelScheduledValues(ctx.currentTime); g.gain.setTargetAtTime(Math.max(0.0001, v), ctx.currentTime, sec / 3); }
+    };
+  }
+
+  // ------------------------------------------------------------------ synthesized effects
   function env(g, t, a, peak, decay) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(peak, t + a);
     g.gain.exponentialRampToValueAtTime(0.0001, t + a + decay);
   }
-  function osc(type, freq, t, a, peak, decay, dest, detune = 0) {
+  function osc(type, freq, t, a, peak, decay, channel = 'flute', detune = 0) {
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.setValueAtTime(freq, t); o.detune.value = detune;
-    env(g, t, a, peak, decay); o.connect(g); g.connect(dest || sfxGain);
+    env(g, t, a, peak, decay); o.connect(g); g.connect(ch[channel].gain);
     o.start(t); o.stop(t + a + decay + 0.05);
     return o;
   }
-  function noise(t, dur, filterType, freq, q, peak, dest, freqEnd) {
+  function noise(t, dur, filterType, freq, q, peak, channel = 'flute', freqEnd) {
     const s = ctx.createBufferSource(); s.buffer = noiseBuf;
     const f = ctx.createBiquadFilter(); f.type = filterType; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
     if (freqEnd) f.frequency.exponentialRampToValueAtTime(freqEnd, t + dur);
     const g = ctx.createGain(); env(g, t, Math.min(0.01, dur / 4), peak, dur);
-    s.connect(f); f.connect(g); g.connect(dest || sfxGain);
+    s.connect(f); f.connect(g); g.connect(ch[channel].gain);
     s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.1);
   }
   const ready = () => ctx && ctx.state === 'running';
 
   const sfx = {
-    /** Soft breathy flute accent, pitch walks up the pentatonic scale with the combo. */
-    hit(judgement, combo, type) {
+    /** Soft breathy flute accent; pitch walks up the pentatonic scale with the combo, lane shifts the octave colour. */
+    hit(judgement, combo, accent, lane = 0) {
       if (!ready()) return;
-      const t = ctx.currentTime, f = PENTATONIC[combo % PENTATONIC.length] * (type === 'spell' ? 1 : 1);
+      const t = ctx.currentTime, f = PENTATONIC[(combo + lane * 2) % PENTATONIC.length];
       const vol = judgement === 'perfect' ? 0.10 : judgement === 'good' ? 0.08 : 0.055;
       osc('sine', f, t, 0.012, vol, 0.28);
       osc('triangle', f * 2, t, 0.01, vol * 0.25, 0.14);
       noise(t, 0.08, 'bandpass', f * 2, 6, vol * 0.35);
-      if (judgement === 'perfect') osc('sine', f * 3, t + 0.03, 0.01, 0.025, 0.4);
-      if (type === 'accent' || type === 'spell') osc('sine', f / 2, t, 0.02, 0.05, 0.5);
+      if (judgement === 'perfect') osc('sine', f * 3, t + 0.03, 0.01, 0.03, 0.4);
+      if (accent) osc('sine', f / 2, t, 0.02, 0.05, 0.5);
+    },
+    holdTick(lane) {
+      if (!ready()) return;
+      const t = ctx.currentTime, f = PENTATONIC[(lane * 2 + 4) % PENTATONIC.length];
+      osc('sine', f * 2, t, 0.005, 0.02, 0.08);
+    },
+    holdDone(lane) {
+      if (!ready()) return;
+      const t = ctx.currentTime, f = PENTATONIC[(lane * 2 + 3) % PENTATONIC.length];
+      osc('sine', f, t, 0.01, 0.07, 0.35); osc('sine', f * 1.5, t + 0.06, 0.01, 0.05, 0.4);
+    },
+    chord(size) {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      [0, 2, 4].slice(0, size).forEach((n, i) => osc('sine', PENTATONIC[n + 2] * 2, t + i * 0.03, 0.01, 0.035, 0.45));
     },
     miss() {
       if (!ready()) return;
       const t = ctx.currentTime;
-      osc('triangle', 196, t, 0.005, 0.06, 0.18, null, 0).frequency.exponentialRampToValueAtTime(140, t + 0.18);
+      osc('triangle', 196, t, 0.005, 0.06, 0.18).frequency.exponentialRampToValueAtTime(140, t + 0.18);
       osc('sawtooth', 207, t, 0.005, 0.02, 0.16);
       noise(t, 0.12, 'lowpass', 900, 1, 0.05);
+    },
+    wrong() {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      osc('square', 233, t, 0.003, 0.025, 0.09); osc('square', 247, t, 0.003, 0.02, 0.09);
     },
     /** Giantess footstep. intensity 0..1 (slow walk .. run). */
     step(intensity) {
       if (!ready()) return;
       const t = ctx.currentTime;
-      const o = osc('sine', 70 + intensity * 20, t, 0.004, 0.10 + intensity * 0.12, 0.22);
+      const o = osc('sine', 70 + intensity * 20, t, 0.004, 0.10 + intensity * 0.12, 0.22, 'footsteps');
       o.frequency.exponentialRampToValueAtTime(38, t + 0.22);
-      noise(t, 0.10 + intensity * 0.06, 'lowpass', 500 + intensity * 600, 1, 0.05 + intensity * 0.08);
-      noise(t + 0.01, 0.25, 'bandpass', 1400, 1.2, 0.015 + intensity * 0.03); // wet sand / water
+      noise(t, 0.10 + intensity * 0.06, 'lowpass', 500 + intensity * 600, 1, 0.05 + intensity * 0.08, 'footsteps');
+      noise(t + 0.01, 0.25, 'bandpass', 1400, 1.2, 0.015 + intensity * 0.03, 'footsteps'); // wet sand / water
     },
     /** Danger heartbeat. */
     warning(level) {
       if (!ready()) return;
       const t = ctx.currentTime, v = 0.07 + level * 0.07;
-      osc('sine', 58, t, 0.01, v, 0.16).frequency.exponentialRampToValueAtTime(40, t + 0.16);
-      osc('sine', 54, t + 0.22, 0.01, v * 0.8, 0.2).frequency.exponentialRampToValueAtTime(38, t + 0.42);
+      osc('sine', 58, t, 0.01, v, 0.16, 'danger').frequency.exponentialRampToValueAtTime(40, t + 0.16);
+      osc('sine', 54, t + 0.22, 0.01, v * 0.8, 0.2, 'danger').frequency.exponentialRampToValueAtTime(38, t + 0.42);
     },
     mesmerize() {
       if (!ready()) return;
@@ -116,23 +252,37 @@ PAM.AudioManager = (function () {
     roar() {
       if (!ready()) return;
       const t = ctx.currentTime;
-      const o = osc('sawtooth', 110, t, 0.08, 0.07, 0.9); o.frequency.exponentialRampToValueAtTime(70, t + 0.9);
-      osc('sawtooth', 113, t, 0.08, 0.05, 0.9).frequency.exponentialRampToValueAtTime(66, t + 0.9);
-      noise(t, 0.8, 'bandpass', 600, 2, 0.08, null, 250);
+      const o = osc('sawtooth', 110, t, 0.08, 0.07, 0.9, 'danger'); o.frequency.exponentialRampToValueAtTime(70, t + 0.9);
+      osc('sawtooth', 113, t, 0.08, 0.05, 0.9, 'danger').frequency.exponentialRampToValueAtTime(66, t + 0.9);
+      noise(t, 0.8, 'bandpass', 600, 2, 0.08, 'danger', 250);
+    },
+    /** Dramatic impact for the capture (low boom + crack). */
+    impact() {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      osc('sine', 85, t, 0.003, 0.35, 0.9, 'danger').frequency.exponentialRampToValueAtTime(30, t + 0.9);
+      noise(t, 0.25, 'lowpass', 2500, 0.7, 0.25, 'danger', 200);
+      noise(t, 0.05, 'highpass', 2000, 0.7, 0.15, 'danger');
     },
     grab() {
       if (!ready()) return;
       const t = ctx.currentTime;
-      noise(t, 0.35, 'bandpass', 2400, 1, 0.12, null, 300);
-      osc('sine', 90, t + 0.05, 0.005, 0.2, 0.35).frequency.exponentialRampToValueAtTime(40, t + 0.4);
+      noise(t, 0.35, 'bandpass', 2400, 1, 0.12, 'danger', 300);
+      osc('sine', 90, t + 0.05, 0.005, 0.2, 0.35, 'danger').frequency.exponentialRampToValueAtTime(40, t + 0.4);
     },
     splash() {
       if (!ready()) return;
       const t = ctx.currentTime;
-      noise(t, 1.4, 'lowpass', 6000, 0.7, 0.35, null, 300);
-      noise(t + 0.05, 0.6, 'bandpass', 1800, 1.5, 0.18, null, 500);
-      osc('sine', 120, t, 0.005, 0.25, 0.5).frequency.exponentialRampToValueAtTime(35, t + 0.5);
-      for (let i = 0; i < 8; i++) osc('sine', 600 + Math.random() * 900, t + 0.3 + Math.random() * 1.2, 0.005, 0.02, 0.06);
+      noise(t, 1.4, 'lowpass', 6000, 0.7, 0.35, 'danger', 300);
+      noise(t + 0.05, 0.6, 'bandpass', 1800, 1.5, 0.18, 'danger', 500);
+      osc('sine', 120, t, 0.005, 0.25, 0.5, 'danger').frequency.exponentialRampToValueAtTime(35, t + 0.5);
+      for (let i = 0; i < 8; i++) osc('sine', 600 + Math.random() * 900, t + 0.3 + Math.random() * 1.2, 0.005, 0.02, 0.06, 'danger');
+    },
+    finalNote() {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      [0, 2, 4, 7].forEach((n, i) => osc('sine', PENTATONIC[n % 8] * (n >= 7 ? 2 : 1), t + i * 0.05, 0.01, 0.07, 1.6));
+      noise(t, 1.2, 'highpass', 6000, 0.7, 0.03);
     },
     victory() {
       if (!ready()) return;
@@ -146,12 +296,21 @@ PAM.AudioManager = (function () {
   };
 
   return {
-    init, resume, ctxTimeAtPerf, resetClock, sfx,
+    CHANNELS, init, resume, ctxTimeAtPerf, resetClock, sfx,
+    setChannelVolume, duck, resetDucking, loadPack, sampleList, play,
     get ctx() { return ctx; },
+    get packMode() { return packMode; },
     get musicInput() { init(); return musicFilter; },
-    setMusicVolume(v) { init(); musicGain.gain.setTargetAtTime(v, ctx.currentTime, 0.02); },
-    setSfxVolume(v) { init(); sfxGain.gain.setTargetAtTime(v, ctx.currentTime, 0.02); },
-    /** 0 = normal, 1 = fully underwater (muffled and quieter). */
+    // kept for MusicPlayer (element fallback reads volumes.music)
+    setMusicVolume(v) { setChannelVolume('music', v); },
+    channelVolume(name) { return volumes[name] !== undefined ? volumes[name] : 1; },
+    /** Current per-channel gain values (for the debug overlay and tests). */
+    mixerState() {
+      const out = {};
+      if (ctx) for (const n of CHANNELS) out[n] = { volume: +ch[n].gain.gain.value.toFixed(3), duck: +ch[n].duck.gain.value.toFixed(3) };
+      return out;
+    },
+    /** 0 = normal, 1 = fully underwater (muffled). */
     setUnderwater(amount, seconds = 0.6) {
       if (!ctx) return;
       const f = 22000 * Math.pow(250 / 22000, amount);

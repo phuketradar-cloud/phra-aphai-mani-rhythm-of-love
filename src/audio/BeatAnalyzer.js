@@ -386,9 +386,92 @@
     return keep.map(n => ({ time: +n.time.toFixed(3), lane: 0, type: n.type, difficulty: n.difficulty }));
   }
 
+  /**
+   * Four-lane conversion (lanes 0..3 = W/up, A/left, S/down, D/right). Deterministic per seed.
+   * Input: single-lane notes {time, type normal|soft|accent|spell, difficulty}. Output notes:
+   *   {time, lane, type normal|double|chord|hold|stream, difficulty, duration?, chord?, accent?}
+   * - chords: extra notes on other lanes at the same time, tagged with a higher difficulty than
+   *   the base note, so EASY never gets them, NORMAL gets doubles, HARD gets 3-note chords
+   * - holds: only where the next note in the densest (HARD) view is far away, so a hold never
+   *   overlaps anything at any difficulty
+   * - streams: runs of >= 4 fast notes (HARD view) get stair / zig-zag lane patterns
+   * - no "jacks" (same lane twice) when notes are closer than 0.3 s
+   */
+  function toFourLane(notes, seed = 1, opts = {}) {
+    const o = Object.assign({ doubleChance: 0.45, holdMinGap: 0.62, holdChance: 0.5, holdMax: 1.4, streamGap: 0.3, jackGap: 0.3 }, opts);
+    const r = (() => { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();
+    const base = notes.map(n => ({ time: n.time, difficulty: n.difficulty || 1, src: n.type || 'normal', window: n.window, fx: n.fx }))
+      .sort((a, b) => a.time - b.time);
+
+    // 1) streams in the densest view
+    const inStream = new Set();
+    for (let i = 0; i < base.length;) {
+      let j = i;
+      while (j + 1 < base.length && base[j + 1].time - base[j].time <= o.streamGap) j++;
+      if (j - i + 1 >= 4) for (let k = i; k <= j; k++) inStream.add(k);
+      i = j + 1;
+    }
+    // 2) lanes
+    const patterns = [[0, 1, 2, 3], [3, 2, 1, 0], [1, 3, 0, 2], [0, 2, 1, 3], [2, 0, 3, 1]];
+    let last = Math.floor(r() * 4), pattern = null, step = 0;
+    base.forEach((n, i) => {
+      const gap = i ? n.time - base[i - 1].time : 9;
+      if (inStream.has(i)) {
+        if (!inStream.has(i - 1)) { pattern = patterns[Math.floor(r() * patterns.length)]; step = pattern.indexOf(last) + 1; }
+        let lane = pattern[step++ % 4];
+        if (lane === last) lane = pattern[step++ % 4];
+        n.lane = lane;
+      } else {
+        let lane;
+        do { lane = Math.floor(r() * 4); } while (lane === last && gap < o.jackGap + 0.4);
+        n.lane = lane;
+      }
+      last = n.lane;
+    });
+    // 3) output with chords and holds
+    const out = [];
+    let chordId = 0;
+    base.forEach((n, i) => {
+      const next = base[i + 1], gapNext = next ? next.time - n.time : 9;
+      const accent = n.src === 'accent' || n.src === 'spell';
+      const note = { time: n.time, lane: n.lane, type: inStream.has(i) ? 'stream' : 'normal', difficulty: n.difficulty };
+      if (accent) note.accent = true;
+      if (n.window && n.window !== 1) note.window = n.window;
+      if (n.fx) note.fx = n.fx;
+      const extras = [];
+      if (!inStream.has(i)) {
+        if (n.src === 'spell') extras.push(Math.max(2, n.difficulty), 3);
+        else if (n.src === 'accent' && r() < o.doubleChance) extras.push(Math.max(2, n.difficulty));
+      }
+      if (extras.length) {
+        chordId++;
+        note.chord = chordId;
+        const used = [note.lane];
+        const size = extras.length + 1;
+        note.type = size >= 3 ? 'chord' : 'double';
+        for (const d of extras) {
+          let lane; do { lane = Math.floor(r() * 4); } while (used.includes(lane));
+          used.push(lane);
+          out.push({ time: n.time, lane, type: note.type, difficulty: d, chord: chordId });
+        }
+      } else if (!inStream.has(i) && gapNext >= o.holdMinGap && (accent || r() < o.holdChance)) {
+        note.type = 'hold';
+        // ends 0.2 s before the next note (at every difficulty), so release and next press never collide
+        note.duration = +Math.min(o.holdMax, gapNext - 0.2).toFixed(2);
+      }
+      out.push(note);
+    });
+    return out.sort((a, b) => a.time - b.time || a.lane - b.lane);
+  }
+
+  function hashSeed(str) { let h = 2166136261; for (const c of String(str)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; }
+
   /** The editable beat-map file written by tools/analyze-song.js and the editor. */
   function buildBeatmap(an, notes, { id, title, audio, tool }) {
+    if (!notes.some(n => n.lane > 0)) notes = toFourLane(notes, hashSeed(id));
     return {
+      format: 2,
+      lanes: ['up', 'left', 'down', 'right'],
       song: title, id, audio,
       duration: +an.duration.toFixed(3),
       bpm: +an.bpm.toFixed(2),
@@ -410,6 +493,6 @@
       `window.PAM_BEATMAPS[${JSON.stringify(map.id)}] = ${JSON.stringify(map)};\n`;
   }
 
-  return { analyze, generateChart, buildBeatmap, embeddedJs, onsetEnvelope, estimateTempo, trackBeats, refineToAttack };
+  return { analyze, generateChart, toFourLane, hashSeed, buildBeatmap, embeddedJs, onsetEnvelope, estimateTempo, trackBeats, refineToAttack };
 });
 

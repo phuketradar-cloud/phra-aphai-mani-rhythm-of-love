@@ -5,7 +5,7 @@
 window.PAM = window.PAM || {};
 PAM.Storage = (function () {
   const KEY_SETTINGS = 'pam.settings.v1';
-  const KEY_RECORDS = 'pam.records.v1';
+  const KEY_RECORDS = 'pam.records.v2';   // v2 = four-lane game (one-key records are not comparable)
   const KEY_BEATMAP = 'pam.beatmapOverride.';
 
   function read(key, fallback) {
@@ -16,7 +16,16 @@ PAM.Storage = (function () {
   }
 
   return {
-    loadSettings() { return Object.assign({}, PAM.Config.defaults, read(KEY_SETTINGS, {})); },
+    loadSettings() {
+      const saved = read(KEY_SETTINGS, {});
+      // migrate the single-slider settings of the one-key version
+      if (saved.musicVolume !== undefined && saved.volMusic === undefined) saved.volMusic = saved.musicVolume;
+      if (saved.sfxVolume !== undefined && saved.volFlute === undefined) saved.volFlute = saved.sfxVolume;
+      delete saved.musicVolume; delete saved.sfxVolume;
+      const s = Object.assign({}, PAM.Config.defaults, saved);
+      if (!Array.isArray(s.keymap) || s.keymap.length !== 4) s.keymap = PAM.Config.defaults.keymap.slice();
+      return s;
+    },
     saveSettings(s) { write(KEY_SETTINGS, s); },
 
     getRecord(songId, difficulty) {

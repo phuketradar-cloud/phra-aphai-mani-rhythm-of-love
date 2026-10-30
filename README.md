@@ -25,30 +25,46 @@ manually on the Song Selection screen.
 Use a current Chrome, Edge or Firefox on desktop. The first click or key press unlocks audio.
 
 ### วิธีเล่นแบบย่อ (Thai quick start)
-1. ดับเบิลคลิก `Play.bat` → กด **เริ่มเล่น** → เลือกความยาก → **บรรเลง**
-2. กด **SPACE** (หรือ ลูกศร / คลิกเมาส์) เมื่อโน้ตเลื่อนมาถึงวงแหวนทางซ้าย
-3. กดพลาด นางยักษ์จะก้าวเข้ามา · พลาดติดกัน 4 ครั้งขึ้นไป นางจะวิ่ง!
-4. เล่นต่อเนื่องให้แม่น นางจะต้องมนตร์และถอยห่างออกไป · รอดจนจบเพลง = หลบหนีสำเร็จ
+1. ดับเบิลคลิก `Play.bat` (หรือเปิดลิงก์ GitHub Pages) → กด **เริ่มเล่น** → เลือกเพลงและความยาก → **บรรเลง**
+2. มี 4 เลน: **W** บน · **A** ซ้าย · **S** ล่าง · **D** ขวา — กดปุ่มของเลนเมื่อโน้ตถึงวงแหวนทางซ้าย
+3. โน้ตที่มีเส้นทองเชื่อม = กดพร้อมกัน · แถบยาว = กดค้างจนสุดแถบ
+4. กดพลาด นางยักษ์จะก้าวเข้ามา · พลาดติดกัน 4 ครั้งขึ้นไป นางจะวิ่ง! · ผู้ชมจะเชียร์เมื่อเล่นดี และโห่เมื่อพลาด
+5. รอดจนโน้ตสุดท้าย = **PERFORMANCE COMPLETE**
 
 ## 2. Controls
 
 | Action | Keys |
 |---|---|
-| Play the flute (hit) | `Space`, `←` `↑` `→` `↓`, `J`, `F` (during play), or mouse click on the scene |
+| Lane UP / LEFT / DOWN / RIGHT | `W` `A` `S` `D` (remappable in Settings). The arrow keys `↑` `←` `↓` `→` always work as a second set. Mouse/touch: press on a lane row. |
 | Pause / resume | `P` or `Esc` (also the ❚❚ button) |
 | Retry while paused | `R` |
 | Fullscreen | `F` (outside gameplay) or the Fullscreen button |
 
-Pressing when no note is near is **not** punished. Holding a key never registers twice.
+* Keys are tracked with real keydown/keyup state. Browser auto-repeat is ignored, a lane that is
+  already held cannot hit again, and any combination of lanes can be pressed at once (WA, SD, all
+  of WASD) as far as the keyboard allows.
+* A press with no note anywhere near is **not** punished. A press in an empty lane while another
+  lane has a note shows **WRONG KEY**. It does not move the giantess or break the combo; set
+  `Config.input.wrongLaneBreaksCombo` to make it stricter.
+* **Key remapping:** Settings → Key mapping. Click a lane, then press the new key; Esc cancels.
+  Assigning a key that another lane already uses swaps the two. "Reset" restores W A S D.
 
 ## 3. Gameplay rules
 
 * **Judgement windows** (Normal): PERFECT ±50 ms, GOOD ±100 ms, OK ±150 ms; outside that is MISS.
-  Easy widens them ×1.3 and Hard narrows them ×0.8. A note can only be judged once, and
-  un-hit notes become MISS automatically once their window has passed.
-* **Note colours:** cyan = beat, blue = off-beat, gold = strong beat (×1.5 score),
-  red = "spell" phrase note (×2). The combo multiplier rises +0.1 every 10 combo, up to ×2.
-* **Pursuit** (`pursuitDistance` 1.0 → 0.0):
+  Easy widens them ×1.3 and Hard narrows them ×0.8. Every lane is judged on its own. A note can
+  only be judged once, and an un-hit note becomes MISS once its window has passed. EARLY / LATE
+  hints appear for non-PERFECT hits.
+* **Note kinds** (each lane has its own colour and arrow: W cyan ▲, A gold ◀, S red ▼, D violet ▶):
+  * **normal**: one key.
+  * **double / chord**: 2 or 3 lanes at the same moment, joined by a gold line. A bonus of
+    +100 per note is paid when every note in the group is hit.
+  * **hold**: press on the head and keep holding until the end of the bar. Releasing within
+    0.15 s of the end still counts. Releasing earlier shows "RELEASED" and counts as a miss.
+  * **stream**: fast runs with stair / zig-zag lane patterns (Hard).
+  * A thick outline marks a strong beat (×1.5 score). The combo multiplier rises +0.1 every 10
+    combo, up to ×2.
+* **Pursuit** (`pursuitDistance` 1.0 → 0.0), unchanged:
   * 1 miss: she takes one visible step and the combo breaks.
   * 2 misses in a row: a bigger step plus a short chase.
   * 3 misses in a row: fast walk, danger effects and a heartbeat.
@@ -56,27 +72,32 @@ Pressing when no note is near is **not** punished. Holding a key never registers
   * Hits push her back slightly and fill the **spell meter**. With a combo of 4+ and a strong
     spell she drifts back on her own (recovery).
   * One or two misses never lose the game. Losing takes a sustained streak of misses.
-* **Win:** survive to the end of the song → ESCAPE SUCCESSFUL. **Lose:** she reaches him, then
-  the grab, carry, splash and underwater cinematic plays → GAME OVER.
-* The results screen shows final score, best combo, accuracy, PERFECT/GOOD/OK/MISS counts and
-  song completion %, with **Retry / Song Selection / Main Menu**. Retry rebuilds the run state
-  from scratch without reloading the page.
-
+* **Success ending:** after the final note, the note is emphasised, the scene holds still for a
+  moment, then the audience erupts (celebration, applause, whistles and a vocal cheer) and
+  **PERFORMANCE COMPLETE** appears, followed by the results.
+* **Failure ending:** she reaches him. Gameplay stops, and you hear a roar, a dramatic impact and
+  crowd gasps. Then the grab, carry, splash and underwater transition play → **GAME OVER**.
+* The results screen shows final score, best combo, accuracy, completion %, difficulty,
+  PERFECT/GOOD/OK/MISS counts, holds kept and broken, chords completed and wrong-key presses.
+  **Retry / Song Selection / Main Menu** are offered. Retry rebuilds the run state without
+  reloading the page.
+* **Difficulty comes from the beat map:** Easy has no simultaneous notes and the widest spacing.
+  Normal adds doubles on strong beats. Hard adds 3-note chords, streams and the densest timing.
 ## 4. The music and the beat maps
 
 Seven songs are on the Song Selection screen. Each song has its own beat map and its own records:
 
-| Song | File | Length | Pulse / felt BPM | Easy / Normal / Hard notes |
-|---|---|---|---|---|
-| Feltwood Requiem | `assets/music/Feltwood Requiem.wav` (48 kHz WAV) | 2:56 | 148 / 74 | 107 / 219 / 350 |
-| Bionic | `assets/music/bionic.mp3` (embedded tag title: "Whispers of the Void") | 3:28 | 137.2 / 68.6 | 148 / 259 / 455 |
-| Ethereal Requiem | `assets/music/ethereal_requiem.mp3` | 3:49 | 137.2 / 68.6 | 155 / 279 / 490 |
-| Echoes Beyond Eternity | `assets/music/echoes_beyond_eternity.mp3` | 3:54 | 137.2 / 68.6 | 139 / 267 / 479 |
-| Celestial Storm | `assets/music/celestial_storm.mp3` | 3:43 | 137.2 / 68.6 | 138 / 256 / 457 |
-| Wings of the Forgotten | `assets/music/wings_of_the_forgotten.mp3` | 3:59 | 137.2 / 68.6 | 151 / 291 / 512 |
-| The Mermaid's Lament | `assets/music/mermaids_lament.mp3` | 5:54 | 140.6 / 70.3 | 226 / 419 / 602 |
+| Song | File | Length | Pulse / felt BPM | Easy / Normal / Hard notes | Holds |
+|---|---|---|---|---|---|
+| Feltwood Requiem | `assets/music/Feltwood Requiem.wav` (48 kHz WAV) | 2:56 | 148 / 74 | 107 / 260 / 394 | 34 |
+| Bionic | `assets/music/bionic.mp3` (embedded tag title: "Whispers of the Void") | 3:28 | 137.2 / 68.6 | 148 / 305 / 505 | 19 |
+| Ethereal Requiem | `assets/music/ethereal_requiem.mp3` | 3:49 | 137.2 / 68.6 | 155 / 345 / 560 | 14 |
+| Echoes Beyond Eternity | `assets/music/echoes_beyond_eternity.mp3` | 3:54 | 137.2 / 68.6 | 139 / 331 / 547 | 25 |
+| Celestial Storm | `assets/music/celestial_storm.mp3` | 3:43 | 137.2 / 68.6 | 138 / 326 / 534 | 23 |
+| Wings of the Forgotten | `assets/music/wings_of_the_forgotten.mp3` | 3:59 | 137.2 / 68.6 | 151 / 353 / 577 | 13 |
+| The Mermaid's Lament | `assets/music/mermaids_lament.mp3` | 5:54 | 140.6 / 70.3 | 226 / 505 / 695 | 125 |
 
-Minimum gaps between notes in every map: Easy ≥ 0.78 s, Normal ≥ 0.38 s, Hard ≥ 0.19 s.
+Note counts include every key press, so a 2-note double counts as 2. Minimum gaps between distinct note times in every map: Easy ≥ 0.78 s, Normal ≥ 0.38 s, Hard ≥ 0.19 s. Easy never has simultaneous notes.
 
 The audio is played unmodified: no resampling, pitch or tempo change. The MP3 maps were made by the
 same analyzer running in the browser (MP3 decoded at 48 kHz), because the Node tool only reads WAV.
@@ -111,51 +132,122 @@ The sections below describe Feltwood Requiem in detail.
 * Sections from RMS energy: intro (3–16 s), intense (16–29 s), quiet (29–42 s), build…, a
   breakdown at 94 s, intense at 107 s, **final intense section 147–160 s**, outro.
 
-### The chart
-One editable file, **`assets/beatmaps/feltwood_requiem.json`**. Each note lists the lowest
-difficulty it appears in, so Normal contains Easy and Hard contains Normal:
-
-| Difficulty | Notes | Avg density | Minimum gap |
-|---|---|---|---|
-| Easy | 107 | 0.63 / s | 0.78 s |
-| Normal | 219 | 1.30 / s | 0.39 s |
-| Hard | 350 | 2.08 / s | 0.20 s |
+### The chart (beat map format 2: four lanes)
+One editable file per song, e.g. **`assets/beatmaps/feltwood_requiem.json`**. Each note lists the
+lowest difficulty it appears in, so Normal contains Easy and Hard contains Normal.
 
 ```json
 {
+  "format": 2, "lanes": ["up", "left", "down", "right"],
   "song": "Feltwood Requiem", "bpm": 148.03, "feltBpm": 74.01, "offset": 3.208,
   "sections": [{ "start": 3.208, "end": 16.1, "energy": 0.199, "kind": "intro" }],
   "notes": [
-    { "time": 4.807, "lane": 0, "type": "accent", "difficulty": 1 },
-    { "time": 5.206, "lane": 0, "type": "soft",   "difficulty": 3, "window": 1.2, "fx": "sparkle" }
+    { "time": 4.807, "lane": 2, "type": "hold",   "difficulty": 1, "duration": 0.6, "accent": true },
+    { "time": 6.205, "lane": 0, "type": "double", "difficulty": 1, "chord": 3, "accent": true },
+    { "time": 6.205, "lane": 3, "type": "double", "difficulty": 2, "chord": 3 },
+    { "time": 9.410, "lane": 1, "type": "stream", "difficulty": 3, "window": 1.2, "fx": "sparkle" }
   ]
 }
 ```
-`time` is in seconds. `lane` is 0 because every hit key counts. `type` is normal, soft, accent or spell.
-`difficulty` is 1, 2 or 3. `window` is an optional per-note timing multiplier. `fx` is an optional effect name.
+| Field | Meaning |
+|---|---|
+| `time` | seconds on the song clock |
+| `lane` | 0 = W / up, 1 = A / left, 2 = S / down, 3 = D / right |
+| `type` | `normal`, `double`, `chord`, `hold`, `stream` |
+| `duration` | hold length in seconds (hold notes only) |
+| `chord` | group id. Notes with the same id are pressed together. Each partner note can have a higher `difficulty`, so Easy shows a single, Normal a double and Hard a 3-note chord. The game recomputes the visible kind per difficulty. |
+| `difficulty` | 1 easy, 2 normal, 3 hard (lowest level that contains the note) |
+| `window` | optional per-note timing-window multiplier |
+| `accent` | strong beat (×1.5 score, thicker outline) |
+| `fx` | optional effect name (`sparkle`, `burst`) |
 
-After editing the JSON by hand, run `node tools/analyze-song.js` **only if you want to regenerate
-from scratch**. Otherwise update the `file://` copy by downloading **.beatmap.js** from the editor.
+Old one-key maps (format 1), including an old editor override saved in the browser, are converted
+to four lanes automatically when loaded. `node tools/convert-4lane.js [--force]` converts the files
+on disk. Lanes, chords, holds and streams come from `BeatAnalyzer.toFourLane`, which is
+deterministic per song: no jacks (same lane twice) faster than 0.3 s, and holds only where no other
+note follows at any difficulty.
 
 ### Beat Map Editor (`editor.html`, or "ตัวแก้ไขโน้ต" in the menu)
-* Waveform, sections, a snap grid (BPM / offset / 1/1, 1/2 or 1/4) or **snap to detected beats**.
-* Click a row to **add** a note (row = difficulty). Drag to **move**, right-click or `Del` to
-  **remove**. `1`/`2`/`3` set difficulty, `T` cycles type, arrow keys nudge by 5 ms (1 ms with
-  Shift), `Ctrl+Z` undoes.
-* **Play** with ticks scheduled on the audio clock at every note to check timing by ear.
-  Tap-record mode (`K`) adds notes live.
-* **Analyze audio** runs the same analyzer in the browser (5–15 s). **Regenerate notes…** rebuilds
-  the chart with your own density (minimum gaps per difficulty). Red outlines flag notes that are
-  too close together.
-* **Save to game** stores the map in this browser, and the game uses it right away.
-  **Playtest from playhead** opens the game at that point. **Download JSON / .beatmap.js** to
-  make it permanent, and **Revert to shipped** to go back.
+* Song picker, waveform, sections, a snap grid (BPM / offset / 1/1, 1/2 or 1/4) or **snap to
+  detected beats**.
+* Rows are difficulties. Inside a row, lanes W/A/S/D are stacked top to bottom and coloured like
+  the game. Click to **add**, drag to **move**, right-click or `Del` to **remove**.
+* `W` `A` `S` `D` move the selected note to a lane. `1`/`2`/`3` set difficulty, `H` toggles a hold,
+  `[` `]` change hold length, `X` toggles a strong beat. Arrow keys nudge by 5 ms (1 ms with
+  Shift), and `Ctrl+Z` undoes.
+* **Play** with ticks scheduled on the audio clock at every note, pitched per lane. In
+  **tap-record** mode, W/A/S/D record notes in that lane at the playhead.
+* **Analyze audio** / **Regenerate notes…** rebuild a 4-lane chart with your own density.
+  Red outlines flag notes that are too close (chords sharing a timestamp are allowed).
+* **Save to game**, **Playtest from playhead**, **Download JSON / .beatmap.js**, and
+  **Revert to shipped**.
 
-## 5. Settings (saved in localStorage)
-Music volume, SFX volume, difficulty, note speed (0.6×–1.8×), timing calibration (−200 to +200 ms,
-plus the automatic tap test), screen shake, EARLY/LATE hints and fullscreen. The game also saves
-high score, best combo, best accuracy, best completion and a clear flag per difficulty.
+## 5. Audio: music, flute, voice and crowd
 
+### Mixer (Settings → Audio mixer, all saved)
+| Channel | What plays there |
+|---|---|
+| Master | everything (followed by a limiter so stacked layers never clip) |
+| Background music | the song, unmodified (pitch and tempo untouched) |
+| Flute & musical FX | hit accents (pitch follows combo and lane), chord and hold chimes, misses, countdown |
+| Vocal feedback | the Thai voice reactions |
+| Crowd ambience | murmur loops and the worried murmur |
+| Crowd reactions | applause, cheers, whistles, gasps, groans, boos, celebration |
+| Giantess footsteps | steps, synced to her walk cycle (faster when she runs) |
+| Danger effects | heartbeat, roar, impact, grab, splash |
+
+Voice and crowd can also be switched off with the checkboxes. All level changes use smooth ramps.
+**Ducking:** while a voice line plays, the music dips to 84% (about −1.5 dB) and the crowd
+ambience to 55%. Big celebrations dip the music a little more. The music always stays in front.
+
+### Voice Feedback Manager (`src/audio/VoiceFeedback.js`)
+* Categories (all in `assets/audio/voice/<category>/`): **perfect** (เย้! สุดยอด! วู้ววว! เก่งมาก! แจ๋วเลย!),
+  **good** (เยี่ยม! ดีมาก! ใช่เลย! ดีๆ!), **miss** (อ้าว! โธ่! เฮ้ย! พลาดแล้ว! อุ๊ย!), **streak**
+  (สุดยอดไปเลย! ไฟลุกแล้ว! หยุดไม่อยู่แล้ว! เทพมาก!), **celebrate** (ไชโย! เก่งที่สุดเลย! สุดยอดการแสดง!) and
+  **worried** (ระวัง! นางมาแล้ว! ใกล้แล้ว!). Each phrase has 3 deliveries, 72 clips in total.
+* Not every note gets a voice: a PERFECT has a 16% chance once the PERFECT streak is 3+. A GOOD
+  has 5%. The first miss after a combo has 45%, and a 3-miss streak always gets a line. A PERFECT
+  streak of 8, 16, 24, 32, 48, 64, 96 or 128 always triggers a streak line. Lines play faster and
+  louder as the streak grows. A worried line plays when danger passes 75%.
+* Shuffle bags (no immediate repeats), a 2.4 s global cooldown, and one voice at a time: a
+  higher-priority line may cut a lower one with a short fade, otherwise the new line is skipped.
+* **No text-to-speech at runtime.** The clips are audio files. They were generated offline with
+  the Windows Thai voice (Microsoft Pattara) by `tools/render-voices.ps1`, then trimmed,
+  normalised and given a short room tail by `tools/build-audio.js`.
+
+### Crowd Manager (`src/audio/CrowdManager.js`)
+* **Song start:** louder anticipation chatter with a few claps and a whistle. When the music
+  starts, the crowd settles to a low ambience.
+* **Combo milestones:** 5 = small applause · 10 = applause + cheer · 25 = large applause, whistles
+  and cheer · 50 = big crowd cheer, applause and whistles · 100 (and every 50 after) = full
+  stadium-style celebration with whistles.
+* **Good performance:** excitement (combo and accuracy) slowly raises the ambience and the chance
+  of spontaneous cheers and whistles. A PERFECT streak adds shouts every 12 PERFECTs.
+* **Misses:** 2 in a row brings a groan, 3 a louder groan, and 4+ occasional booing.
+* **Danger:** positive reactions are suppressed, a worried murmur fades in, and the crowd gasps
+  when she starts to charge.
+* **Endings:** success brings a massive celebration with applause, whistles and a vocal cheer.
+  Capture brings gasps and a worried crowd.
+* Per-category cooldowns, shuffle bags, at most 4 reactions at once, random panning and Haas
+  widening so the mono layers sound wide.
+* The crowd sounds are **synthesized by `tools/build-audio.js`**: formant-filtered voices for
+  chatter, cheers, gasps, groans and boos, noise-burst clappers for applause, and pitch-glide
+  whistles. They are not recordings.
+
+### Replacing voice and crowd samples with real recordings
+Put `.wav`, `.mp3` or `.ogg` files into the matching `assets/audio/voice/<category>/` or
+`assets/audio/crowd/<category>/` folder (delete the generated ones if you want only yours). Then
+run `node tools/build-audio.js --manifest-only` to rescan the folders and rewrite
+`assets/audio/manifest.json` / `manifest.js`. No code changes are needed. Category names:
+voice `perfect, good, miss, streak, celebrate, worried`; crowd `murmur, worried, applause_small,
+applause_medium, applause_large, cheer_small, cheer_large, whistle, gasp, groan, boo, celebration`.
+
+## 5b. Settings (saved in localStorage)
+Difficulty, note speed (0.6×–1.8×), timing calibration (−200 to +200 ms, plus the automatic tap
+test), screen shake, EARLY/LATE hints, fullscreen, the 4 lane keys, and the 8 mixer levels plus
+the voice/crowd switches. The game also saves high score, best combo, best accuracy, best completion
+and a clear flag per song and difficulty. Records restarted with the four-lane version
+(`pam.records.v2`), and the old one-key volume settings carry over.
 ## 6. Adding or replacing songs
 1. Put the file in `assets/music/` and add an entry to `PAM.Config.songs` in `src/core/Config.js`:
    `{ id, title, subtitle, audio: ['assets/music/x.mp3'], beatmap: 'assets/beatmaps/<id>.json', art: [x, y, w, h] }`.
@@ -189,58 +281,91 @@ The new song appears on Song Selection automatically, with its own difficulty ta
 ```
 index.html, editor.html, Play.bat
 src/core      Config.js · Storage.js · GameState.js · Game.js (loop, state machine, cinematics)
-src/audio     AudioManager.js (context, buses, synthesized SFX) · MusicPlayer.js (master clock)
-              BeatAnalyzer.js (onsets, tempo, beat tracking, sections, chart generator)
+src/audio     AudioManager.js (mixer, ducking, sample player, synthesized SFX) · MusicPlayer.js (master clock)
+              VoiceFeedback.js · CrowdManager.js
+              BeatAnalyzer.js (onsets, tempo, beat tracking, sections, chart generator, 4-lane conversion)
 src/rhythm    BeatMap.js · Note.js · HitDetector.js · RhythmEngine.js
 src/gameplay  PursuitController.js · ScoreManager.js · DifficultyManager.js
 src/characters Rig.js (pose blending, 2-bone IK) · PhraAphai.js · PhiSueaSamut.js
 src/render    Background.js · Effects.js · TrackRenderer.js
 src/ui        UI.js · Calibration.js · style.css
 src/editor    Editor.js
-tools         analyze-song.js · serve.ps1 · serve.js
-assets        music/ · beatmaps/ · concept/ · characters/ · backgrounds/ · effects/ · fonts/
+tools         analyze-song.js · convert-4lane.js · render-voices.ps1 · build-audio.js · serve.ps1 · serve.js
+assets        music/ · beatmaps/ · audio/voice/ · audio/crowd/ · concept/ · characters/ · backgrounds/ · effects/ · fonts/
 ```
-All tunable numbers (timing windows, pursuit steps and speeds, recovery, spell, difficulty scales,
-scoring, lead-in) live in `src/core/Config.js`.
+All tunable numbers (timing windows, pursuit, difficulty scales, scoring, lane colours, hold
+release tolerance, wrong-lane rule, voice chances and cooldowns, crowd levels and milestones) live
+in `src/core/Config.js`.
 
-Testing URL options: `?autoplay=1` makes a bot hit every note, `?autoplay=miss` makes it hit none,
-`?start=120` starts at 120 s, `?debug=1` shows a timing overlay, and `?autostart` begins as soon as
+Testing URL options: `?autoplay=1` makes a bot hit every note (it also holds the hold notes), `?autoplay=miss` makes it hit none,
+`?start=120` starts at 120 s, `?debug=1` shows a timing, keys, crowd and voice overlay, and `?autostart` begins as soon as
 the music loads.
 
 ## 9. Implemented and tested
-Tested in the Chromium-based browser pane, served over http, on 2026-10-30:
-* Menu → Song Selection → intro → countdown → gameplay, with real music and the beat map.
-* Bot run: every note judged PERFECT and in sync with the audio clock. A human tester also hit
-  PERFECT/GOOD notes live.
-* Pursuit escalation (step, fast walk, run, red vignette, heartbeat) and recovery while playing.
-* Failure: grab, carry, splash, underwater with muffled music, GAME OVER, results, records saved.
-* Success: song end, ESCAPE SUCCESSFUL, results, CLEAR saved and shown on Song Selection.
-* Pause: the clock froze at the exact position. Resume continued from it, matching the expected
-  time within the 47 ms output-latency compensation. Window blur auto-pauses. Retry resets score,
-  combo, distance and music.
-* Settings persist. Calibration tap test measured +36 ms for simulated taps 30 ms late.
-* `file://` fallback (fetch blocked): embedded beat map plus `<audio>` element. The song clock
-  matched `audio.currentTime` exactly.
-* Editor: waveform, analysis (in-browser tempo 147.7 BPM at 44.1 kHz), add/remove/undo, and Save
-  to game, which the game then loaded.
-* `Play.bat`'s PowerShell server serves HTML, JS, JSON and the 34 MB WAV, and blocks path traversal.
+Tested in the Chromium-based browser pane, served over http, on 2026-10-30, with the real songs.
 
+**Four-lane upgrade (WASD, voice, crowd):**
+* Engine tests with a scripted chart: PERFECT / GOOD / early OK (−0.14 s, EARLY hint), a second
+  press in the same lane scores nothing, both halves of a double, a 3-note chord, hold kept to the
+  end (`holdDone`), hold released 0.6 s early (`holdBreak`), wrong-lane press (S while the note is
+  in W) reported as WRONG KEY, and no event while a hold is still held.
+* Key events through the real handlers: W+S together and all four WASD at once each registered.
+  Auto-repeat keydown and a second keydown of an already held key were both ignored. keyup
+  released the right lanes, and the arrow keys work as the second set.
+* Key remapping: I → UP, then I → LEFT swapped A into UP, saved, and used by the input. Reset
+  restores W A S D.
+* Bot run (Feltwood Requiem): doubles with gold connectors, hold bars, the streak counter, chord
+  bonus pop-ups, and crowd milestones at combo 5 (small applause), 10 (applause + cheer) and 25
+  (large applause + whistles + cheer). Varied voice lines played with no immediate repeats, spaced
+  by the cooldown, plus a streak line at 8 PERFECTs.
+* Combo 50 and 100 reactions fired (big cheer, and celebration + applause + 7 whistles + cheer).
+* Ducking measured on the mixer: during a voice line the music was at 0.84 and the crowd ambience
+  at 0.55; both returned to 1.00 afterwards.
+* Success: final-note emphasis, a 0.7 s visual hold, celebration + applause + whistles +
+  celebrate voice, **PERFORMANCE COMPLETE**, then results with the hold/chord/wrong stats. The
+  music was stopped.
+* Failure (miss bot): groans at 2 and 3 misses, a boo at 4+, a gasp when she charged, a miss voice
+  and a worried voice, then impact + gasps at the capture, underwater, GAME OVER and results.
+* Pause froze the song clock; resume matched the expected time within 46 ms (output-latency
+  compensation) and the bot kept hitting with no misses. Retry reset score, combo, hold/chord/wrong
+  counters and the crowd.
+* Editor: loads the 4-lane maps (lane colours, letters, hold bars, chord outlines) with no
+  spacing warnings.
+
+**Earlier features (re-checked where touched):** menu → song select → intro → countdown →
+gameplay; pursuit escalation and recovery; underwater capture cinematic; settings persistence;
+calibration (+36 ms measured for taps 30 ms late); `file://` fallback for music and beat maps;
+`Play.bat` server; GitHub Pages build.
 ## 10. Known limitations / placeholders (honest list)
 * **Character art is procedural 2D vector art** (layered skeletal rigs drawn on canvas, with blended
   poses and IK), not painted illustrations like the concept sheet. It is animated and stylistically
   matched, but it is a placeholder for commissioned sprite or skeletal art (see §7). The painted
   concept art appears on the menu, song and result screens.
 * **Sound effects are synthesized** with Web Audio (flute accent, hit, miss, footsteps, heartbeat,
-  roar, grab, splash). They are mixed under the music. Swap them for recorded samples in
+  roar, impact, grab, splash). They are mixed under the music. Swap them for recorded samples in
   `AudioManager.sfx` if you have them.
+* **Voice reactions are generated, not recorded:** pre-rendered offline with the Windows Thai
+  text-to-speech voice (Pattara) at excited pitch and speed settings. They are proper audio files
+  (no TTS at runtime), but they sound synthetic next to a real person shouting. Replace them with
+  real recordings when you have them (see §5); the system needs no changes.
+* **The crowd is synthesized**, not recorded: applause and whistles are fairly convincing,
+  while chatter, cheers, groans and boos are stylised formant voices. Real crowd recordings
+  dropped into `assets/audio/crowd/` will sound much more like a live concert.
+* In `file://` mode the voice and crowd samples play through plain `<audio>` elements: no ducking,
+  panning or loop cross-fades. Use `Play.bat` or the GitHub Pages link for the full mix.
 * **Audio was verified numerically, not by ear.** The developer could not listen to playback.
-  Notes were checked against onset peaks and clock math. Do one human playtest and use the
-  calibration test if hits feel early or late.
+  Notes were checked against onset peaks and clock math, and the mixer levels and ducking were
+  measured, but the sound of the voice and crowd layers and their balance against each song have
+  not been judged by ear. Do one human playtest and use the mixer and calibration if needed.
 * The in-browser analyzer can lock onto the weaker off-beat phase in some passages. The shipped
   chart was generated from the original 48 kHz WAV and sits on the stronger onsets.
 * The MP3 beat maps were checked with the bot (Bionic and Celestial Storm played in the browser),
   but none of them has been playtested by ear yet.
-* Not tested in Firefox or Safari. Desktop only, with no touch-screen tuning.
+* Not tested in Firefox or Safari. Desktop keyboard first. Mouse/touch can press lanes, but playing
+  chords that way is impractical.
+* Lanes for every song were assigned automatically (`toFourLane`), not hand-charted. Patterns
+  follow the rhythm and avoid fast same-lane repeats, but a human chart designer would shape
+  phrases better. Use the editor to refine them.
 * Google Fonts (Charm, Cinzel, Sarabun) load from the internet. Offline, the game falls back to
   Leelawadee UI or Tahoma.
 * The supplied prototype's README claimed a 207-point WAV beat map, but its code still used

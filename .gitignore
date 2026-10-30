@@ -12,3 +12,6 @@ desktop.ini
 # local tool settings
 .claude/
 node_modules/
+
+# raw TTS renders (rebuilt by tools/render-voices.ps1; the processed clips live in assets/audio/voice)
+tools/voice-src/

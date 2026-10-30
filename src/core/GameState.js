@@ -21,11 +21,15 @@ PAM.GameState = {
       perfect: 0, good: 0, ok: 0, miss: 0,
       judged: 0, totalNotes: 0,
       missStreak: 0,
+      perfectStreak: 0,
+      holdsDone: 0, holdsBroken: 0,   // hold tails kept / released early
+      chords: 0,                      // doubles / chords completed
+      wrong: 0,                       // wrong-lane presses
       endTime: 0,             // song time when the run ended
       cleared: false,
       get accuracy() {
         if (!this.judged) return 1;
-        return (this.perfect + this.good * 0.7 + this.ok * 0.4) / this.judged;
+        return (this.perfect + this.holdsDone + this.good * 0.7 + this.ok * 0.4) / this.judged;
       }
     };
   }

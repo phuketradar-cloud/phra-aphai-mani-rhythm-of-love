@@ -127,38 +127,58 @@
  "notes": [
   {
    "time": 2.384,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 2.806,
    "lane": 0,
-   "type": "normal",
-   "difficulty": 2
+   "type": "hold",
+   "difficulty": 2,
+   "duration": 0.71
   },
   {
    "time": 3.713,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 1
+  },
+  {
+   "time": 3.713,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 1
   },
   {
    "time": 4.598,
-   "lane": 0,
-   "type": "normal",
-   "difficulty": 2
+   "lane": 2,
+   "type": "hold",
+   "difficulty": 2,
+   "duration": 0.68
   },
   {
    "time": 5.483,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 2
+  },
+  {
+   "time": 5.483,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 2
   },
   {
    "time": 5.921,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -169,296 +189,368 @@
   },
   {
    "time": 6.806,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 7.239,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 3
+  },
+  {
+   "time": 7.239,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 3
   },
   {
    "time": 8.129,
-   "lane": 0,
-   "type": "normal",
-   "difficulty": 2
+   "lane": 3,
+   "type": "hold",
+   "difficulty": 2,
+   "duration": 0.68
   },
   {
    "time": 9.014,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 9.451,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 9.889,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 10.337,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 10.774,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.69
   },
   {
    "time": 11.659,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 12.092,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 12.534,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 4
+  },
+  {
+   "time": 12.534,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 4
   },
   {
    "time": 12.982,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 13.43,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 13.867,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 14.305,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 5
+  },
+  {
+   "time": 14.305,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 5
   },
   {
    "time": 14.742,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 15.19,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 15.627,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 16.065,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 16.513,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 16.957,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 17.835,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 6
+  },
+  {
+   "time": 17.835,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 6
   },
   {
    "time": 18.721,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 19.158,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 19.606,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 7
+  },
+  {
+   "time": 19.606,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 7
   },
   {
    "time": 20.486,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 20.918,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 21.347,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 21.803,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 22.241,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 22.689,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 23.126,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 8
+  },
+  {
+   "time": 23.126,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 8
   },
   {
    "time": 23.569,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 24.011,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 24.449,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 24.886,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 25.336,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 25.771,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 26.2,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 26.639,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 9
+  },
+  {
+   "time": 26.639,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 9
   },
   {
    "time": 27.099,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 27.542,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 27.973,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 28.417,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 28.865,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 29.302,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 29.71,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 30.187,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 30.628,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -469,92 +561,112 @@
   },
   {
    "time": 31.489,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 31.947,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 10
+  },
+  {
+   "time": 31.947,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 10
   },
   {
    "time": 32.385,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 32.833,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 33.27,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 33.718,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 34.153,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 34.603,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 35.041,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 35.478,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 11
+  },
+  {
+   "time": 35.478,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 11
   },
   {
    "time": 35.915,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 36.352,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 36.8,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 37.232,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 37.687,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -565,44 +677,54 @@
   },
   {
    "time": 38.56,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 39.008,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 12
+  },
+  {
+   "time": 39.008,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 12
   },
   {
    "time": 39.422,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 39.894,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 40.317,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 40.77,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 41.217,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -613,63 +735,74 @@
   },
   {
    "time": 42.091,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 42.529,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 42.977,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 43.414,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 43.862,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 44.299,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 44.736,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 45.184,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 45.622,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 46.07,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 13
+  },
+  {
+   "time": 46.07,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 13
   },
   {
    "time": 46.955,
@@ -679,140 +812,162 @@
   },
   {
    "time": 47.392,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 47.83,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 48.267,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 48.705,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 49.153,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 49.603,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 14
+  },
+  {
+   "time": 49.603,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 14
   },
   {
    "time": 50.038,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 50.475,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 50.916,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 51.325,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 51.803,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 52.246,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 52.659,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 53.12,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 53.569,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 54.014,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 54.451,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 54.897,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 55.328,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 55.776,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 56.214,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 56.662,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 15
+  },
+  {
+   "time": 56.662,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 15
   },
   {
    "time": 57.099,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -823,182 +978,238 @@
   },
   {
    "time": 57.948,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 58.409,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 16
+  },
+  {
+   "time": 58.409,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 16
   },
   {
    "time": 58.862,
-   "lane": 0,
-   "type": "soft",
-   "difficulty": 2
-  },
-  {
-   "time": 59.307,
    "lane": 0,
    "type": "normal",
    "difficulty": 2
   },
   {
+   "time": 59.307,
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 2
+  },
+  {
    "time": 59.745,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 60.182,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 60.63,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 61.067,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 61.505,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 61.953,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 17
+  },
+  {
+   "time": 61.953,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 17
   },
   {
    "time": 62.39,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 62.838,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 63.712,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 18
+  },
+  {
+   "time": 63.712,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 18
   },
   {
    "time": 64.15,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 64.587,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 65.035,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 65.472,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 19
+  },
+  {
+   "time": 65.472,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 19
   },
   {
    "time": 65.906,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 66.358,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 66.795,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 67.243,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 20
+  },
+  {
+   "time": 67.243,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 20
   },
   {
    "time": 67.68,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 68.118,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 68.542,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 69.003,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 69.451,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 69.888,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 70.326,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 70.774,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 21
+  },
+  {
+   "time": 70.774,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 21
   },
   {
    "time": 71.211,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1009,68 +1220,71 @@
   },
   {
    "time": 72.086,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 72.534,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 72.971,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 73.419,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 73.856,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 74.305,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 74.742,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 75.19,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 75.627,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 76.075,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 76.513,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1081,177 +1295,218 @@
   },
   {
    "time": 77.387,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 77.835,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 22
+  },
+  {
+   "time": 77.835,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 22
   },
   {
    "time": 78.272,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 78.71,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 79.158,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 79.595,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 23
+  },
+  {
+   "time": 79.595,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 23
   },
   {
    "time": 80.032,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 80.47,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 80.923,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 81.366,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 24
+  },
+  {
+   "time": 81.366,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 24
   },
   {
    "time": 81.803,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 82.24,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 82.678,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 83.107,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 83.534,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 84.011,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 84.448,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 84.897,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 85.334,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 85.771,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 86.209,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 86.656,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 87.094,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 87.542,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 87.979,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 88.416,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.69
   },
   {
    "time": 89.302,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 89.739,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 90.187,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 25
+  },
+  {
+   "time": 90.187,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 25
   },
   {
    "time": 91.062,
@@ -1261,38 +1516,49 @@
   },
   {
    "time": 91.51,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 91.947,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.68
   },
   {
    "time": 92.832,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 93.27,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 93.707,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 26
+  },
+  {
+   "time": 93.707,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 26
   },
   {
    "time": 94.144,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1303,92 +1569,120 @@
   },
   {
    "time": 95.04,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 95.504,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 27
+  },
+  {
+   "time": 95.504,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 27
   },
   {
    "time": 95.915,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 96.363,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 96.785,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 97.271,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 28
+  },
+  {
+   "time": 97.271,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 28
   },
   {
    "time": 97.686,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 98.136,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 98.561,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 98.996,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 99.47,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 99.869,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 100.317,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 100.748,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 29
+  },
+  {
+   "time": 100.748,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 29
   },
   {
    "time": 101.237,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1399,134 +1693,157 @@
   },
   {
    "time": 102.117,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 102.559,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 30
+  },
+  {
+   "time": 102.559,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 30
   },
   {
    "time": 102.974,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 103.399,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 103.841,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 104.279,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 104.71,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 105.184,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 105.622,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 106.059,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.69
   },
   {
    "time": 106.945,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 107.39,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 107.813,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 108.267,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 108.715,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 109.126,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 109.59,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 31
+  },
+  {
+   "time": 109.59,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 31
   },
   {
    "time": 110.038,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 110.475,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 110.919,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 111.361,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 111.798,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1537,116 +1854,129 @@
   },
   {
    "time": 112.683,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 113.121,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 113.569,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 114.021,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 114.443,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 114.891,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 115.334,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 115.766,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 116.206,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 116.657,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 32
+  },
+  {
+   "time": 116.657,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 32
   },
   {
    "time": 117.099,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 117.537,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 117.974,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 118.411,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 118.859,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 119.296,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 119.737,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 120.165,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 120.619,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1657,92 +1987,127 @@
   },
   {
    "time": 121.495,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 121.953,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 33
+  },
+  {
+   "time": 121.953,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 33
   },
   {
    "time": 122.386,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 122.83,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 123.274,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 123.68,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 124.157,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 124.599,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 125.03,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 125.483,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 34
+  },
+  {
+   "time": 125.483,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 34
   },
   {
    "time": 125.921,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 126.358,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 126.795,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 127.243,
    "lane": 0,
-   "type": "spell",
-   "difficulty": 1
+   "type": "chord",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 35
+  },
+  {
+   "time": 127.243,
+   "lane": 2,
+   "type": "chord",
+   "difficulty": 2,
+   "chord": 35
+  },
+  {
+   "time": 127.243,
+   "lane": 3,
+   "type": "chord",
+   "difficulty": 3,
+   "chord": 35
   },
   {
    "time": 127.68,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1753,116 +2118,137 @@
   },
   {
    "time": 128.545,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 129.003,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 129.428,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 129.889,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 130.326,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 130.774,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 36
+  },
+  {
+   "time": 130.774,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 36
   },
   {
    "time": 131.211,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 131.649,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 132.085,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 132.534,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 37
+  },
+  {
+   "time": 132.534,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 37
   },
   {
    "time": 132.982,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 133.403,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 133.856,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 134.305,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 134.742,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 135.179,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 135.627,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 136.065,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 136.484,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1873,44 +2259,62 @@
   },
   {
    "time": 137.39,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 137.79,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 38
+  },
+  {
+   "time": 137.79,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 38
   },
   {
    "time": 138.273,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 138.71,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 139.131,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 139.617,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 39
+  },
+  {
+   "time": 139.617,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 39
   },
   {
    "time": 140.065,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -1921,116 +2325,129 @@
   },
   {
    "time": 140.909,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 141.355,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 141.803,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 142.243,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 142.701,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 143.12,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 143.544,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 143.988,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 144.48,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 144.847,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 145.306,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 145.802,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 146.196,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 146.656,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 40
+  },
+  {
+   "time": 146.656,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 40
   },
   {
    "time": 147.094,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 147.531,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 147.979,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 148.416,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 148.854,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2041,104 +2458,142 @@
   },
   {
    "time": 149.731,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 150.163,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 41
+  },
+  {
+   "time": 150.163,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 41
   },
   {
    "time": 150.624,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 151.035,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 151.478,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 151.947,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 42
+  },
+  {
+   "time": 151.947,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 42
   },
   {
    "time": 152.405,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 152.822,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 153.261,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 153.706,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.69
   },
   {
    "time": 154.592,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 155.034,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 155.478,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 43
+  },
+  {
+   "time": 155.478,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 43
   },
   {
    "time": 156.353,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 156.79,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 157.238,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 44
+  },
+  {
+   "time": 157.238,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 44
   },
   {
    "time": 157.675,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2149,158 +2604,166 @@
   },
   {
    "time": 158.56,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 158.973,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.71
   },
   {
    "time": 159.883,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 160.321,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 160.758,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 161.206,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 161.643,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 162.08,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 162.529,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 162.966,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 163.403,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 163.851,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 164.288,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 164.726,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 165.174,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 165.596,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 166.059,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 166.497,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 166.934,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 167.371,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 167.819,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 168.261,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 168.704,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 169.142,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 169.59,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 170.027,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2311,44 +2774,61 @@
   },
   {
    "time": 170.901,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 171.35,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 171.771,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 172.224,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 172.666,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 173.11,
    "lane": 0,
-   "type": "spell",
-   "difficulty": 1
+   "type": "chord",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 45
+  },
+  {
+   "time": 173.11,
+   "lane": 2,
+   "type": "chord",
+   "difficulty": 2,
+   "chord": 45
+  },
+  {
+   "time": 173.11,
+   "lane": 3,
+   "type": "chord",
+   "difficulty": 3,
+   "chord": 45
   },
   {
    "time": 173.547,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2359,314 +2839,367 @@
   },
   {
    "time": 174.433,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 174.88,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 46
+  },
+  {
+   "time": 174.88,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 46
   },
   {
    "time": 175.318,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 175.755,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 176.203,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 176.64,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 177.081,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 177.515,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 177.963,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 178.363,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 178.85,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 179.286,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 179.723,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 180.157,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 47
+  },
+  {
+   "time": 180.157,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 47
   },
   {
    "time": 180.606,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 181.046,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 181.486,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 181.927,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 182.346,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 182.806,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 183.207,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 183.691,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 48
+  },
+  {
+   "time": 183.691,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 48
   },
   {
    "time": 184.128,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 184.577,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 184.98,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 185.445,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 185.895,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 186.337,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 186.773,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 187.222,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 187.659,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 188.096,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 188.563,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 188.947,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 189.419,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 189.853,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 190.305,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 190.742,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 191.179,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 191.616,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 192.063,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 192.503,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 49
+  },
+  {
+   "time": 192.503,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 49
   },
   {
    "time": 192.943,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 193.166,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 193.397,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 193.825,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 194.262,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 50
+  },
+  {
+   "time": 194.262,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 50
   },
   {
    "time": 194.699,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 195.112,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 195.589,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 196.023,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 196.491,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2677,80 +3210,91 @@
   },
   {
    "time": 197.353,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 197.793,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 198.196,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 198.632,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 199.103,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 199.313,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 199.541,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 51
+  },
+  {
+   "time": 199.541,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 51
   },
   {
    "time": 199.98,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 200.399,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 200.868,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 201.313,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 201.742,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 201.938,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2761,152 +3305,183 @@
   },
   {
    "time": 202.648,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 203.036,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 52
+  },
+  {
+   "time": 203.036,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 52
   },
   {
    "time": 203.521,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 203.958,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 204.395,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 204.843,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 53
+  },
+  {
+   "time": 204.843,
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 53
   },
   {
    "time": 205.718,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 206.162,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 206.603,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 207.04,
    "lane": 0,
-   "type": "soft",
+   "type": "stream",
    "difficulty": 2
   },
   {
    "time": 207.234,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "stream",
    "difficulty": 3
   },
   {
    "time": 207.482,
-   "lane": 0,
-   "type": "normal",
+   "lane": 1,
+   "type": "stream",
    "difficulty": 1
   },
   {
    "time": 207.701,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "stream",
    "difficulty": 3
   },
   {
    "time": 207.924,
    "lane": 0,
-   "type": "soft",
+   "type": "stream",
    "difficulty": 2
   },
   {
    "time": 208.359,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.46
   },
   {
    "time": 209.017,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 209.215,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 209.663,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 210.084,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 54
+  },
+  {
+   "time": 210.084,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 54
   },
   {
    "time": 210.55,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 210.997,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 211.409,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 211.838,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 212.32,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 212.531,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2917,44 +3492,62 @@
   },
   {
    "time": 213.198,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 213.632,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 55
+  },
+  {
+   "time": 213.632,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 55
   },
   {
    "time": 214.077,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 214.518,
-   "lane": 0,
+   "lane": 3,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 214.955,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 215.399,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 56
+  },
+  {
+   "time": 215.399,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 56
   },
   {
    "time": 215.802,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -2965,92 +3558,112 @@
   },
   {
    "time": 216.692,
-   "lane": 0,
-   "type": "soft",
+   "lane": 2,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 217.159,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 217.601,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 218.038,
-   "lane": 0,
+   "lane": 2,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 218.475,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 218.913,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 2,
+   "chord": 57
+  },
+  {
+   "time": 218.913,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 57
   },
   {
    "time": 219.361,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 219.798,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 220.258,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 220.673,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 58
+  },
+  {
+   "time": 220.673,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 58
   },
   {
    "time": 221.11,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 221.558,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 222.026,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 222.451,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 222.867,
-   "lane": 0,
-   "type": "soft",
+   "lane": 1,
+   "type": "normal",
    "difficulty": 3
   },
   {
@@ -3061,99 +3674,121 @@
   },
   {
    "time": 223.784,
-   "lane": 0,
-   "type": "soft",
+   "lane": 3,
+   "type": "normal",
    "difficulty": 2
   },
   {
    "time": 224.222,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 224.641,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 225.098,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 225.524,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 225.944,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 226.382,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 226.84,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 1
   },
   {
    "time": 227.29,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 227.748,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 2,
+   "type": "normal",
+   "difficulty": 1,
+   "accent": true
   },
   {
    "time": 228.187,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 228.608,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 229.065,
    "lane": 0,
-   "type": "soft",
+   "type": "normal",
    "difficulty": 3
   },
   {
    "time": 229.483,
    "lane": 0,
-   "type": "spell",
-   "difficulty": 1
+   "type": "chord",
+   "difficulty": 3,
+   "chord": 59
+  },
+  {
+   "time": 229.483,
+   "lane": 1,
+   "type": "chord",
+   "difficulty": 2,
+   "chord": 59
+  },
+  {
+   "time": 229.483,
+   "lane": 3,
+   "type": "chord",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 59
   },
   {
    "time": 230.358,
    "lane": 0,
-   "type": "normal",
-   "difficulty": 2
+   "type": "hold",
+   "difficulty": 2,
+   "duration": 0.68
   },
   {
    "time": 231.233,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 3,
+   "type": "hold",
+   "difficulty": 1,
+   "accent": true,
+   "duration": 0.67
   },
   {
    "time": 232.107,
@@ -3164,20 +3799,38 @@
   {
    "time": 232.982,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 60
+  },
+  {
+   "time": 232.982,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 60
   },
   {
    "time": 233.856,
-   "lane": 0,
+   "lane": 1,
    "type": "normal",
    "difficulty": 2
   },
   {
    "time": 234.731,
    "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 61
+  },
+  {
+   "time": 234.731,
+   "lane": 2,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 61
   },
   {
    "time": 235.606,
@@ -3187,15 +3840,32 @@
   },
   {
    "time": 236.481,
-   "lane": 0,
-   "type": "accent",
-   "difficulty": 1
+   "lane": 1,
+   "type": "double",
+   "difficulty": 2,
+   "chord": 62
+  },
+  {
+   "time": 236.481,
+   "lane": 3,
+   "type": "double",
+   "difficulty": 1,
+   "accent": true,
+   "chord": 62
   },
   {
    "time": 237.355,
-   "lane": 0,
-   "type": "normal",
-   "difficulty": 2
+   "lane": 2,
+   "type": "hold",
+   "difficulty": 2,
+   "duration": 1.4
   }
+ ],
+ "format": 2,
+ "lanes": [
+  "up",
+  "left",
+  "down",
+  "right"
  ]
 }

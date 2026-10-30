@@ -94,7 +94,17 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
 .audio-fallback { margin-top: 20px; padding: 16px 20px; border: 1px dashed var(--gold); border-radius: 12px; font-size: 19px; }
 
 /* ---------- settings ---------- */
-.settings-panel { width: 1180px; }
+.settings-panel { width: 1700px; padding: 36px 48px; }
+.settings-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+.set-h { margin: 18px 0 0; font-size: 24px; color: var(--gold-l); }
+.settings-panel .settings-grid { grid-template-columns: 300px 1fr; gap: 12px 22px; margin-top: 14px; font-size: 22px; }
+.settings-panel input[type=range] { width: 300px; }
+.keymap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+.keymap button { font: 600 18px var(--font-ui); color: var(--silver); background: rgba(8, 16, 38, .85); border: 2px solid var(--lane, #5fe3ff); border-radius: 14px; padding: 12px 8px; cursor: pointer; }
+.keymap button b { display: block; font: 800 38px var(--font-title); color: var(--lane, #5fe3ff); }
+.keymap button.waiting { background: rgba(227, 180, 92, .25); animation: blink .45s infinite alternate; }
+.row-buttons.left { justify-content: flex-start; margin-top: 18px; }
+.res-extra { margin: 12px 0 0; font-size: 19px; color: var(--muted); }
 .settings-grid { display: grid; grid-template-columns: 380px 1fr; gap: 16px 30px; align-items: center; margin-top: 26px; font-size: 24px; }
 .settings-grid label small { display: block; font-size: 15px; color: var(--muted); letter-spacing: .06em; }
 .settings-grid.compact { grid-template-columns: 200px 1fr; font-size: 22px; }
@@ -141,7 +151,7 @@ select { font: 600 22px var(--font-ui); padding: 8px 14px; border-radius: 10px; 
 .results-panel { width: 1460px; display: flex; gap: 44px; padding: 36px; }
 .results-art { flex: none; width: 460px; height: 640px; border-radius: 16px; border: 1.5px solid var(--line); }
 .results-body { flex: 1; }
-.results-body h1 { font: 800 92px var(--font-title); margin: 6px 0 0; letter-spacing: .04em; }
+.results-body h1 { font: 800 74px/1.05 var(--font-title); margin: 6px 0 0; letter-spacing: .04em; }
 .results-body h1.win { color: var(--gold-l); text-shadow: 0 0 40px rgba(227, 180, 92, .5); }
 .results-body h1.lose { color: #ff5f7e; text-shadow: 0 0 40px rgba(255, 60, 90, .45); }
 .res-msg { font-size: 28px; color: #d0d9ee; margin: 6px 0 20px; }

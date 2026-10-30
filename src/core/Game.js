@@ -20,6 +20,12 @@ PAM.Game = class Game {
     this.canvas = $('scene');
     this.ctx = this.canvas.getContext('2d');
     this.engine = new PAM.RhythmEngine();
+    this.voice = new PAM.VoiceFeedbackManager(PAM.AudioManager);
+    this.crowd = new PAM.CrowdManager(PAM.AudioManager);
+    this.keysDown = [false, false, false, false];   // physical key state per lane (keydown/keyup)
+    this.botHeld = [0, 0, 0, 0];                     // autoplay bot: hold release times per lane
+    this.remapLane = null;                           // lane waiting for a new key on the remap screen
+    this.pack = null;                                // voice/crowd sample pack load result
     this.pursuit = new PAM.PursuitController();
     this.prince = new PAM.PhraAphai();
     this.giant = new PAM.PhiSueaSamut();
@@ -79,7 +85,23 @@ PAM.Game = class Game {
       e.target.value = '';
     });
 
+    this.track.setKeyLabels(this.keyLabels());
+    this.ui.renderKeymap(this.keyLabels());
     await this.selectSong(this.song.id);
+    this.loadAudioPack();
+  }
+
+  /** Voice + crowd samples (about 7 MB) load after the song, in the background. */
+  async loadAudioPack() {
+    const manifest = await fetch('assets/audio/manifest.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => window.PAM_AUDIO_MANIFEST);
+    if (!manifest) { this.pack = { files: 0, failed: 0, mode: 'none' }; return; }
+    this.pack = await PAM.AudioManager.loadPack(manifest);
+    console.info('audio pack', this.pack);
+  }
+
+  /** Display labels for the four lane keys (e.g. "W"). */
+  keyLabels() {
+    return this.settings.keymap.map(code => code.replace(/^Key/, '').replace(/^Digit/, '').replace(/^Arrow/, '').replace('Space', '␣').toUpperCase().slice(0, 5));
   }
 
   playerFor(song) {
@@ -154,11 +176,16 @@ PAM.Game = class Game {
   // =================================================================== settings
   saveSettings() { PAM.Storage.saveSettings(this.settings); }
   applyAudioSettings() {
-    this.music.setVolume(this.settings.musicVolume);
-    PAM.AudioManager.setSfxVolume(this.settings.sfxVolume);
+    const s = this.settings, m = s.volMaster;
+    const map = { music: s.volMusic, flute: s.volFlute, voice: s.volVoice, crowdAmb: s.volCrowdAmb, crowdReact: s.volCrowdReact, footsteps: s.volFootsteps, danger: s.volDanger };
+    for (const name in map) PAM.AudioManager.setChannelVolume(name, map[name] * m);
+    this.music.setVolume(s.volMusic * m);
+    this.voice.enabled = s.voiceEnabled;
+    this.crowd.enabled = s.crowdEnabled;
+    if (!s.crowdEnabled) this.crowd.stopLoops(0.5);
   }
   onSettingChanged(key) {
-    if (key === 'musicVolume' || key === 'sfxVolume') this.applyAudioSettings();
+    if (key.startsWith('vol') || key === 'voiceEnabled' || key === 'crowdEnabled') this.applyAudioSettings();
     if (key === 'difficulty') this.renderSongSelect();
     this.saveSettings();
   }
@@ -184,7 +211,26 @@ PAM.Game = class Game {
       case 'start':
       case 'retry': this.startSong(); break;
       case 'fullscreen': this.toggleFullscreen(); break;
+      case 'resetKeys':
+        this.settings.keymap = PAM.Config.defaults.keymap.slice(); this.saveSettings(); this.remapLane = null;
+        this.track.setKeyLabels(this.keyLabels()); this.ui.renderKeymap(this.keyLabels()); break;
+      case 'testVoice': PAM.AudioManager.resume(); this.voice.say(['perfect', 'good', 'miss', 'streak'][Math.floor(Math.random() * 4)], { force: true, priority: 3 }); break;
+      case 'testCrowd': PAM.AudioManager.resume(); this.crowd.react(['applause_medium', 'cheer_small', 'whistle', 'groan'][Math.floor(Math.random() * 4)], { force: true }); break;
+      default:
+        if (name.startsWith('remap')) { this.remapLane = +name.slice(5); this.ui.renderKeymap(this.keyLabels(), this.remapLane); }
     }
+  }
+
+  /** Remap screen: assign `code` to the lane waiting for a key (swaps if another lane used it). */
+  assignKey(code) {
+    const lane = this.remapLane, map = this.settings.keymap;
+    const other = map.indexOf(code);
+    if (other >= 0 && other !== lane) map[other] = map[lane];
+    map[lane] = code;
+    this.remapLane = null;
+    this.saveSettings();
+    this.track.setKeyLabels(this.keyLabels());
+    this.ui.renderKeymap(this.keyLabels());
   }
 
   toggleFullscreen() {
@@ -198,10 +244,21 @@ PAM.Game = class Game {
     window.addEventListener('keydown', e => {
       const code = e.code;
       const typing = e.target && (e.target.tagName === 'SELECT');
-      if (this.ui.current === 'calibrate' && code === 'Space') { e.preventDefault(); if (!e.repeat) this.calib.tap(this.eventTime(e)); return; }
-      if (K.hit.includes(code) && this.isRhythmState()) {
+      // remap screen: the next key press becomes the lane's key (Esc cancels)
+      if (this.remapLane !== null) {
         e.preventDefault();
-        if (!e.repeat && this.state === this.S.PLAYING) this.press(this.eventTime(e));
+        if (code === 'Escape') { this.remapLane = null; this.ui.renderKeymap(this.keyLabels()); }
+        else if (!['KeyP', 'F11'].includes(code)) this.assignKey(code);
+        return;
+      }
+      if (this.ui.current === 'calibrate' && code === 'Space') { e.preventDefault(); if (!e.repeat) this.calib.tap(this.eventTime(e)); return; }
+      const lane = this.laneFor(code);
+      if (lane >= 0 && this.isRhythmState()) {
+        e.preventDefault();
+        // auto-repeat is never gameplay input, and a lane that is already down cannot hit again
+        if (e.repeat || this.keysDown[lane]) return;
+        this.keysDown[lane] = true;
+        if (this.state === this.S.PLAYING) this.press(lane, this.eventTime(e));
         return;
       }
       if (e.repeat) return;
@@ -214,15 +271,42 @@ PAM.Game = class Game {
       if (code === 'KeyF' && !typing && !this.isRhythmState()) this.toggleFullscreen();
       if (code === 'KeyR' && this.state === this.S.PAUSED) this.startSong();
     });
-    this.stage.addEventListener('pointerdown', e => {
-      if (this.state !== this.S.PLAYING) return;
-      if (e.target.closest('button, .screen, a, input')) return;
-      e.preventDefault();
-      this.press(this.eventTime(e));
+    window.addEventListener('keyup', e => {
+      const lane = this.laneFor(e.code);
+      if (lane < 0 || !this.keysDown[lane]) return;
+      this.keysDown[lane] = false;
+      if (this.state === this.S.PLAYING) this.release(lane, this.eventTime(e));
     });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) this.autoPause(); });
-    window.addEventListener('blur', () => this.autoPause());
+    // mouse / touch: pressing on a lane row plays that lane
+    this.pointerLane = {};
+    this.stage.addEventListener('pointerdown', e => {
+      if (this.state !== this.S.PLAYING || e.target.closest('button, .screen, a, input')) return;
+      const r = this.stage.getBoundingClientRect(), y = (e.clientY - r.top) / r.height * PAM.Config.HEIGHT;
+      const lane = this.track.laneY.findIndex(ly => Math.abs(y - ly) <= this.track.laneH / 2);
+      if (lane < 0 || this.keysDown[lane]) return;
+      e.preventDefault();
+      this.pointerLane[e.pointerId] = lane; this.keysDown[lane] = true;
+      this.press(lane, this.eventTime(e));
+    });
+    const pointerUp = e => {
+      const lane = this.pointerLane[e.pointerId];
+      if (lane === undefined) return;
+      delete this.pointerLane[e.pointerId]; this.keysDown[lane] = false;
+      if (this.state === this.S.PLAYING) this.release(lane, this.eventTime(e));
+    };
+    window.addEventListener('pointerup', pointerUp); window.addEventListener('pointercancel', pointerUp);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.releaseAllKeys(); this.autoPause(); } });
+    window.addEventListener('blur', () => { this.releaseAllKeys(); this.autoPause(); });
   }
+
+  /** Lane for a key code: the configurable keymap first, the arrow keys as a fixed second set. */
+  laneFor(code) {
+    const i = this.settings.keymap.indexOf(code);
+    return i >= 0 ? i : PAM.Config.keys.altLanes.indexOf(code);
+  }
+
+  /** Focus loss: keyup events are lost, so treat every key as released. */
+  releaseAllKeys() { this.keysDown = [false, false, false, false]; this.pointerLane = {}; }
 
   isRhythmState() { return [this.S.PLAYING, this.S.RESUMING, this.S.INTRO].includes(this.state); }
 
@@ -235,12 +319,27 @@ PAM.Game = class Game {
   /** Song time with the player's calibration applied (used for judging AND drawing). */
   songTime(perf) { return this.music.timeAt(perf) - this.settings.calibrationMs / 1000; }
 
-  press(perfTime) {
+  press(lane, perfTime) {
     const t = this.songTime(perfTime);
-    this.track.pressed();
-    const res = this.engine.press(t);
-    if (res) this.onHit(res);
-    // pressing with no note in range is intentionally not punished
+    this.track.pressed(lane);
+    const ev = this.engine.press(lane, t);
+    if (ev) this.handleEvent(ev);
+    // a press with no note anywhere near is intentionally not punished
+  }
+
+  release(lane, perfTime) {
+    const ev = this.engine.release(lane, this.songTime(perfTime));
+    if (ev) this.handleEvent(ev);
+  }
+
+  handleEvent(ev) {
+    switch (ev.type) {
+      case 'hit': return this.onHit(ev);
+      case 'miss': return this.onMiss(ev.note, 'MISS');
+      case 'holdBreak': return this.onMiss(ev.note, 'RELEASED');
+      case 'holdDone': return this.onHoldDone(ev.note);
+      case 'wrong': return this.onWrong(ev);
+    }
   }
 
   // =================================================================== run lifecycle
@@ -272,8 +371,13 @@ PAM.Game = class Game {
     this.resetScene();
     this.pursuit.reset(D);
     this.run = this.S.createRun(this.song, key);
-    this.run.totalNotes = this.engine.total;
+    this.run.totalNotes = this.engine.totalJudgements;
     this.stateT = 0; this.lastCount = null; this.finalAnnounced = false; this.heartbeat = 0;
+    this.releaseAllKeys(); this.botHeld = [0, 0, 0, 0];
+    this.lastMood = null; this.worriedSaid = false; this.freezeT = 0;
+    PAM.AudioManager.resetDucking();
+    this.voice.reset();
+    this.crowd.intro();
     this.prince.setState('idle');
     this.giant.setState('idle');
     this.ui.hideScreens();
@@ -284,6 +388,7 @@ PAM.Game = class Game {
 
   stopRun() {
     this.music.stop();
+    this.crowd.reset(); this.voice.reset(); PAM.AudioManager.resetDucking();
     this.run = null;
     this.state = this.S.MENU;
     this.ui.setHud(false);
@@ -295,6 +400,8 @@ PAM.Game = class Game {
     if (this.state !== this.S.PLAYING && this.state !== this.S.RESUMING) return;
     this.pausedAt = this.music.pause();
     this.state = this.S.PAUSED;
+    this.crowd.pause(); this.voice.stop();
+    this.releaseAllKeys();
     this.ui.countdown(null);
     this.ui.refreshSettings();
     this.ui.show('pause', { remember: false });
@@ -308,48 +415,99 @@ PAM.Game = class Game {
     this.ui.hideScreens();
     this.resumePos = this.pausedAt;
     this.music.play(this.pausedAt, PAM.Config.resumeLeadIn);
+    this.crowd.resume();
     this.state = this.S.RESUMING;
     this.lastCount = null;
   }
 
   // =================================================================== gameplay events
   onHit({ note, judgement, delta }) {
-    const run = this.run;
-    const gained = PAM.ScoreManager.hit(run, judgement, note.type);
+    const run = this.run, T = this.track, y = T.laneY[note.lane];
+    const gained = PAM.ScoreManager.hit(run, judgement, note);
     this.pursuit.onHit(judgement);
     this.prince.react('success');
-    const col = PAM.TrackRenderer.colorFor(note.type);
+    const col = PAM.TrackRenderer.laneColor(note.lane);
     const jCol = { perfect: '#7ee8ff', good: '#a6f0a0', ok: '#f6d88c' }[judgement];
-    this.track.hit(jCol);
-    this.fx.burst(this.track.hitX, this.track.y, col, judgement === 'perfect' ? 22 : 12);
-    this.fx.ring(this.track.hitX, this.track.y, jCol, 30, judgement === 'perfect' ? 110 : 80);
-    this.fx.popup(judgement.toUpperCase(), this.track.hitX + 20, this.track.y - 100, jCol, judgement === 'perfect' ? 50 : 42);
+    T.hit(note.lane, jCol);
+    T.text(note.lane, judgement.toUpperCase(), jCol);
+    T.bumpCombo();
+    // PERFECT: strong luminous burst; GOOD: moderate; OK: small
+    if (judgement === 'perfect') { this.fx.burst(T.hitX, y, col, 20, 300); this.fx.ring(T.hitX, y, '#ffffff', 18, 70, 0.35, 3); this.fx.ring(T.hitX, y, col, 22, 95, 0.45, 4); }
+    else if (judgement === 'good') { this.fx.burst(T.hitX, y, col, 9, 200); this.fx.ring(T.hitX, y, jCol, 20, 60, 0.35, 3); }
+    else this.fx.burst(T.hitX, y, col, 5, 140);
     // optional per-note visual effect from the beat map ("fx": "sparkle" | "burst")
     if (note.fx === 'sparkle') for (let i = 0; i < 12; i++) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 120, col);
-    if (note.fx === 'burst') this.fx.burst(this.track.hitX, this.track.y, '#ffffff', 40, 420);
-    const n = 1 + (run.combo >= 10 ? 1 : 0) + (run.combo >= 30 ? 1 : 0);
-    this.fx.musicNotes(this.prince.fluteTip, this.giant.headWorld, n, col);
-    PAM.AudioManager.sfx.hit(judgement, run.combo, note.type);
+    if (note.fx === 'burst') this.fx.burst(T.hitX, y, '#ffffff', 40, 420);
+    if (Math.random() < 0.6 || note.accent) this.fx.musicNotes(this.prince.fluteTip, this.giant.headWorld, run.combo >= 30 ? 2 : 1, col);
+    PAM.AudioManager.sfx.hit(judgement, run.combo, note.accent, note.lane);
     if (judgement !== 'perfect' && this.settings.showEarlyLate) { this.timingHint = delta < 0 ? 'EARLY' : 'LATE'; this.timingHintAge = 0; }
-    if (run.combo > 0 && run.combo % 25 === 0) {
-      PAM.AudioManager.sfx.mesmerize();
-      this.fx.popup(`COMBO ${run.combo}!`, 960, 470, '#f6d88c', 64, 1.1);
-      for (let i = 0; i < 20; i++) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 120, '#f6d88c');
+
+    // chords: bonus when every note of the group is hit
+    if (note.chord) {
+      const group = this.engine.chordNotes(note.chord);
+      if (group.every(n => n.judged && n.judgement !== 'miss')) {
+        const bonus = 100 * group.length;
+        run.score += bonus; run.chords++;
+        PAM.AudioManager.sfx.chord(group.length);
+        this.fx.popup(group.length >= 3 ? `CHORD! +${bonus}` : `DOUBLE! +${bonus}`, 960, 690, '#f6d88c', 40, 0.8);
+      }
     }
+    // streak / milestones -> voices and crowd
+    run.perfectStreak = judgement === 'perfect' ? run.perfectStreak + 1 : 0;
+    this.voice.onJudge(judgement, run.perfectStreak, 0, run.combo);
+    this.crowd.onPerfectStreak(run.perfectStreak);
+    if (this.crowd.onCombo(run.combo)) this.milestoneFx(run.combo);
     return gained;
   }
 
-  onMiss() {
-    const run = this.run;
+  milestoneFx(combo) {
+    PAM.AudioManager.sfx.mesmerize();
+    this.fx.popup(`${combo} COMBO!`, 960, 640, combo >= 50 ? '#ffd27a' : '#f6d88c', combo >= 50 ? 72 : 58, 1.2);
+    this.fx.ring(960, 740, '#f6d88c', 30, combo >= 50 ? 420 : 260, 0.8, 5);
+    for (let i = 0; i < (combo >= 50 ? 40 : 20); i++) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 120, '#f6d88c');
+    if (combo >= 100) { this.flash = 0.25; for (let i = 0; i < 30; i++) this.fx.sparkle(960, 500, i % 2 ? '#ffd27a' : '#bfefff'); }
+  }
+
+  /** A head that was never hit, or a hold released too early. */
+  onMiss(note, label) {
+    const run = this.run, T = this.track, y = T.laneY[note.lane];
     PAM.ScoreManager.miss(run);
+    if (label === 'RELEASED') run.holdsBroken++;
+    run.perfectStreak = 0;
     this.pursuit.onMiss();
     this.prince.react('miss');
     this.giant.flinch();
-    this.fx.popup('MISS', this.track.hitX + 20, this.track.y - 100, '#ff5479', 44);
+    T.hit(note.lane, '#ff3355'); T.text(note.lane, label, '#ff5479');
+    this.fx.ring(T.hitX, y, '#ff3355', 16, 55, 0.35, 4);
+    this.fx.burst(T.hitX, y, '#ff3355', 8, 160);
+    if (run.missStreak <= 2) this.fx.popup(label === 'RELEASED' ? 'RELEASED' : 'MISS', 960, 690, '#ff5479', 40, 0.6);
     PAM.AudioManager.sfx.miss();
     this.addShake(3 + Math.min(run.missStreak, 4) * 2);
     if (run.missStreak === 3) PAM.AudioManager.sfx.warning(0.6);
     if (run.missStreak === 4) PAM.AudioManager.sfx.roar();
+    this.voice.onJudge('miss', 0, run.missStreak, run.combo);
+    this.crowd.onMiss(run.missStreak);
+  }
+
+  onHoldDone(note) {
+    const run = this.run, T = this.track, y = T.laneY[note.lane];
+    PAM.ScoreManager.holdDone(run);
+    run.holdsDone++;
+    this.pursuit.onHit('good');
+    T.hit(note.lane, '#f6d88c'); T.text(note.lane, 'HOLD!', '#f6d88c'); T.bumpCombo();
+    this.fx.burst(T.hitX, y, PAM.TrackRenderer.laneColor(note.lane), 14, 240);
+    PAM.AudioManager.sfx.holdDone(note.lane);
+    if (this.crowd.onCombo(run.combo)) this.milestoneFx(run.combo);
+  }
+
+  /** Key pressed in the wrong lane while another lane had a note. */
+  onWrong(ev) {
+    const run = this.run, T = this.track;
+    run.wrong++;
+    T.hit(ev.lane, '#ff8a3d'); T.text(ev.lane, 'WRONG KEY', '#ff8a3d');
+    PAM.AudioManager.sfx.wrong();
+    this.addShake(2);
+    if (PAM.Config.input.wrongLaneBreaksCombo) { run.combo = 0; run.perfectStreak = 0; }
   }
 
   addShake(a) { if (this.settings.screenShake) this.shake = Math.min(30, this.shake + a); }
@@ -379,7 +537,9 @@ PAM.Game = class Game {
       case S.CAPTURE: this.updateCapture(dt); break;
       case S.VICTORY: this.updateVictory(dt); break;
     }
-    if (this.state !== S.PAUSED) {
+    // the finale holds the scene still for a moment after the final note
+    const frozen = this.state === S.VICTORY && this.stateT < 0.7;
+    if (this.state !== S.PAUSED && !frozen) {
       this.prince.update(dt); this.giant.update(dt); this.fx.update(dt); this.track.update(dt);
     }
     this.timingHintAge += dt;
@@ -401,6 +561,7 @@ PAM.Game = class Game {
     if (this.stateT > 2.4) {
       this.ui.banner(null);
       this.music.play(this.startOffset, PAM.Config.leadIn);
+      this.crowd.songStart();
       this.setState(this.S.PLAYING);
     }
   }
@@ -409,15 +570,20 @@ PAM.Game = class Game {
     const run = this.run, t = this.songTime(now);
     this.updateCountdown(t, this.startOffset);
 
+    // test bot (?autoplay=1): presses each note's lane on time and holds hold-notes to the end
+    let keys = this.keysDown;
     if (this.autoplay === '1') {
       for (const n of this.engine.notes) {
         if (n.judged || n.time > t) continue;
-        const r = this.engine.press(n.time + (Math.random() - 0.5) * 0.02);
-        if (r) this.onHit(r);
+        const ev = this.engine.press(n.lane, n.time + (Math.random() - 0.5) * 0.02);
+        if (ev) this.handleEvent(ev);
+        if (n.kind === 'hold') this.botHeld[n.lane] = n.endTime + 0.05;
       }
+      keys = keys.map((k, l) => k || t < this.botHeld[l]);
     }
-    for (const n of this.engine.update(t)) this.onMiss(n);
+    for (const ev of this.engine.update(t, keys)) this.handleEvent(ev);
     this.pursuit.update(dt);
+    if (this.state !== this.S.PLAYING) return;   // an event may have ended the run
 
     // giantess follows the pursuit model; after the last note she is lost in the music
     this.giant.x = this.giantX(this.pursuit.pursuitDistance);
@@ -440,9 +606,18 @@ PAM.Game = class Game {
       this.fx.popup('FINAL VERSE · ท่อนสุดท้าย', 960, 430, '#ff8aa0', 52, 1.6);
     }
 
+    // audience: excitement follows the performance, tension follows the danger
+    this.crowd.update(dt, { combo: run.combo, accuracy: run.accuracy, danger: d });
+    const mood = this.pursuit.mood;
+    if (mood === 'running' && this.lastMood !== 'running' && this.lastMood !== 'attack') this.crowd.onCharge();
+    this.lastMood = mood;
+    if (d > 0.75 && !this.worriedSaid) { this.worriedSaid = this.voice.say('worried', { priority: 2 }); }
+    if (d < 0.5) this.worriedSaid = false;
+
     this.ui.updateHud(run, this.pursuit, Math.max(0, t) / dur);
     if (this.pursuit.caught) return this.startCapture(t);
-    if (t >= dur - 0.03 || (!this.music.playing && t > 1)) return this.startVictory(t);
+    if (this.engine.total && this.engine.allJudged && t > this.startOffset) return this.startFinale(t);
+    if (t >= dur - 0.03 || (!this.music.playing && t > 1)) return this.startFinale(t);
   }
 
   updateCountdown(t, start) {
@@ -473,7 +648,10 @@ PAM.Game = class Game {
     this.giant.setState('attack');
     this.prince.setState('panic');
     this.grabbed = false; this.splashed = false; this.capBase = null;
+    this.releaseAllKeys();
+    this.voice.stop();
     PAM.AudioManager.sfx.roar();
+    this.crowd.capture();   // gasps + worried audience
     this.addShake(10);
   }
 
@@ -484,7 +662,9 @@ PAM.Game = class Game {
       this.grabbed = true;
       this.capBase = { x: p.bodyCenter.x, y: p.bodyCenter.y };
       g.setState('capture'); p.setState('caught');
+      PAM.AudioManager.sfx.impact();
       PAM.AudioManager.sfx.grab();
+      this.crowd.react('gasp', { gain: 0.8, force: true, rate: 1.08 });
       this.flash = 0.8; this.addShake(22);
     }
     if (this.grabbed) {
@@ -520,20 +700,46 @@ PAM.Game = class Game {
   }
 
   // =================================================================== success ending
-  startVictory(t) {
+  /**
+   * Success: the final note is emphasised, the scene holds still for a beat, then the audience
+   * erupts (celebration + applause + whistles + a vocal cheer) and PERFORMANCE COMPLETE appears.
+   */
+  startFinale(t) {
     this.run.endTime = t;
     this.setState(this.S.VICTORY);
+    this.finaleCheered = false; this.finaleFaded = false;
+    this.releaseAllKeys();
     this.giant.setState('mesmerized');
     this.prince.setState('play');
     this.ui.countdown(null);
-    this.ui.banner('ESCAPE SUCCESSFUL', 'นางยักษ์หลับใหลในมนตร์เสียงปี่ · หลบหนีสำเร็จ!');
-    PAM.AudioManager.sfx.victory();
+    const last = this.engine.notes.filter(n => Math.abs(n.time - this.engine.notes[this.engine.notes.length - 1].time) < 0.01);
+    for (const n of last.length ? last : [{ lane: 0 }]) {
+      const y = this.track.laneY[n.lane];
+      this.track.hit(n.lane, '#ffffff');
+      this.fx.ring(this.track.hitX, y, '#ffffff', 20, 260, 1.1, 6);
+      this.fx.burst(this.track.hitX, y, '#f6d88c', 50, 520);
+    }
+    this.flash = 0.35; this.zoom = 1.03;
+    PAM.AudioManager.sfx.finalNote();
   }
 
   updateVictory(dt) {
-    if (Math.random() < dt * 30) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 140, Math.random() < 0.5 ? '#f6d88c' : '#bfe9ff');
-    if (Math.random() < dt * 3) this.fx.musicNotes(this.prince.fluteTip, this.giant.headWorld, 1, '#f6d88c');
-    if (this.stateT > 4) this.finish(true);
+    const T = this.stateT;
+    this.zoom += (1 - this.zoom) * Math.min(1, dt * 2);
+    if (T > 0.7 && !this.finaleCheered) {
+      this.finaleCheered = true;
+      this.crowd.celebrate();
+      this.voice.say('celebrate', { priority: 3, force: true, excitement: 1 });
+      PAM.AudioManager.sfx.victory();
+      this.ui.banner('PERFORMANCE COMPLETE', 'การแสดงจบลงอย่างงดงาม · นางยักษ์หลับใหลในมนตร์เสียงปี่ หลบหนีสำเร็จ!');
+      for (let i = 0; i < 40; i++) this.fx.sparkle(960, 520, i % 2 ? '#f6d88c' : '#bfe9ff');
+    }
+    if (T > 0.7) {
+      if (Math.random() < dt * 30) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 140, Math.random() < 0.5 ? '#f6d88c' : '#bfe9ff');
+      if (Math.random() < dt * 3) this.fx.musicNotes(this.prince.fluteTip, this.giant.headWorld, 1, '#f6d88c');
+    }
+    if (T > 4.2 && !this.finaleFaded) { this.finaleFaded = true; PAM.AudioManager.duck({ music: 0.02 }, 10, 1.6, 0.2); }
+    if (T > 6) this.finish(true);
   }
 
   finish(cleared) {
@@ -542,6 +748,9 @@ PAM.Game = class Game {
     const completion = cleared ? 1 : Math.min(1, run.endTime / this.music.duration);
     this.music.stop();
     PAM.AudioManager.setUnderwater(0, 0.3);
+    PAM.AudioManager.resetDucking();
+    this.crowd.stopLoops(2.5);     // applause tails keep ringing into the results screen
+    this.voice.stop();
     const improved = PAM.Storage.submitRun(this.song.id, run.difficulty, {
       score: run.score, bestCombo: run.bestCombo, accuracy: run.accuracy, completion, cleared
     });
@@ -604,9 +813,14 @@ PAM.Game = class Game {
       ctx.fillStyle = `rgba(255,214,140,${0.08 + 0.05 * Math.sin(this.t * 2)})`; ctx.fillRect(0, 0, W, H);
     }
 
-    if (inRun && this.state !== S.CAPTURE && this.state !== S.VICTORY) {
+    if (inRun && this.state !== S.CAPTURE && !(this.state === S.VICTORY && this.stateT > 1.4)) {
       const approach = PAM.Config.baseApproachTime / this.settings.noteSpeed;
-      this.track.draw(ctx, this.t, songT, this.engine, approach, { timingHint: this.timingHint, timingHintAge: this.timingHintAge });
+      if (this.state === S.VICTORY) { ctx.save(); ctx.globalAlpha = Math.max(0, 1 - (this.stateT - 0.7) / 0.7); }
+      this.track.draw(ctx, this.t, songT, this.engine, approach, {
+        timingHint: this.timingHint, timingHintAge: this.timingHintAge, combo: this.run.combo,
+        keysDown: this.autoplay === '1' ? this.keysDown.map((k, l) => k || songT < this.botHeld[l]) : this.keysDown
+      });
+      if (this.state === S.VICTORY) ctx.restore();
     }
     if (this.debug) this.drawDebug(ctx, songT);
   }
@@ -630,9 +844,11 @@ PAM.Game = class Game {
       `state ${this.state}  fps ${this.fps.toFixed(0)}  audio ${this.music.mode}`,
       `song ${songT.toFixed(3)}s / ${this.music.duration.toFixed(1)}  calib ${this.settings.calibrationMs}ms`,
       `distance ${this.pursuit.pursuitDistance.toFixed(3)}  spell ${this.pursuit.spell.toFixed(2)}  mood ${this.pursuit.mood}`,
-      this.run ? `notes ${this.run.judged}/${this.run.totalNotes}  streak ${this.run.missStreak}` : ''
+      this.run ? `judged ${this.run.judged}/${this.run.totalNotes}  miss streak ${this.run.missStreak}  perfect streak ${this.run.perfectStreak}  wrong ${this.run.wrong}` : '',
+      `keys ${this.keysDown.map((k, i) => k ? 'WASD'[i] : '·').join('')}  crowd exc ${this.crowd.excitement.toFixed(2)} tension ${this.crowd.tension.toFixed(2)}  pack ${this.pack ? this.pack.mode : 'loading'}`,
+      `voice: ${this.voice.log.slice(-2).map(v => v.category).join(', ')}  crowd: ${this.crowd.log.slice(-3).map(c => c.cat).join(', ')}`
     ];
-    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(660, 70, 600, 104);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(660, 70, 600, 148);
     ctx.fillStyle = '#9ff'; ctx.font = '16px monospace'; ctx.textAlign = 'left';
     lines.forEach((l, i) => ctx.fillText(l, 672, 94 + i * 22));
   }

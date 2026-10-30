@@ -42,7 +42,7 @@ a { color: var(--cyan); }
   <button id="btnPlay" class="primary">▶ Play</button>
   <button id="btnStop">■</button>
   <label><input type="checkbox" id="chkTick" checked> Tick on notes</label>
-  <label><input type="checkbox" id="chkRecord"> Tap-record (<kbd>K</kbd>)</label>
+  <label><input type="checkbox" id="chkRecord"> Tap-record (<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>)</label>
  </div>
  <div class="group">
   <label>BPM <input type="number" id="numBpm" step="0.01"></label>
@@ -75,13 +75,13 @@ a { color: var(--cyan); }
   <div id="sel"><p>Click a note to select it.</p></div>
   <h3>Mouse &amp; keys</h3>
   <ul>
-   <li>Click an empty spot in a row: <b>add</b> a note (row = difficulty).</li>
+   <li>Click an empty spot in a row: <b>add</b> a note (row = difficulty; inside a row the lanes W/A/S/D are stacked top to bottom).</li>
    <li>Click a note: select · Drag: <b>move</b> · <kbd>Del</kbd>/right-click: <b>remove</b></li>
-   <li><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> set difficulty · <kbd>T</kbd> cycle type</li>
+   <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move the selected note to that lane (nothing selected: lane for new notes)</li><li><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> difficulty · <kbd>H</kbd> hold on/off · <kbd>[</kbd><kbd>]</kbd> hold length · <kbd>X</kbd> strong beat</li><li>Chord = notes at the same time in different lanes (gold outline = chord group)</li>
    <li><kbd>←</kbd><kbd>→</kbd> nudge selected 5 ms (<kbd>Shift</kbd> 1 ms)</li>
    <li><kbd>Space</kbd> play/pause · click the ruler: seek</li>
    <li>Mouse wheel: scroll · <kbd>Ctrl</kbd>+wheel: zoom</li>
-   <li><kbd>K</kbd> while playing in tap-record mode: add a note at the playhead</li>
+   <li>Tap-record on + playing: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> record notes in that lane at the playhead</li>
    <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> undo</li>
   </ul>
   <h3>Saving</h3>
@@ -90,21 +90,21 @@ a { color: var(--cyan); }
 </div>
 <div id="status"><span id="statusText">Loading…</span><span id="warn"></span></div>
 
-<script src="src/core/Config.js?v=4"></script>
-<script src="src/core/Storage.js?v=4"></script>
-<script src="src/audio/AudioManager.js?v=4"></script>
-<script src="src/audio/MusicPlayer.js?v=4"></script>
-<script src="src/audio/BeatAnalyzer.js?v=4"></script>
-<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/bionic.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/celestial_storm.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=4"></script>
-<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=4"></script>
-<script src="src/rhythm/BeatMap.js?v=4"></script>
-<script src="src/render/TrackRenderer.js?v=4"></script>
-<script src="src/editor/Editor.js?v=4"></script>
+<script src="src/core/Config.js?v=5"></script>
+<script src="src/core/Storage.js?v=5"></script>
+<script src="src/audio/AudioManager.js?v=5"></script>
+<script src="src/audio/MusicPlayer.js?v=5"></script>
+<script src="src/audio/BeatAnalyzer.js?v=5"></script>
+<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/bionic.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/celestial_storm.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=5"></script>
+<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=5"></script>
+<script src="src/rhythm/BeatMap.js?v=5"></script>
+<script src="src/render/TrackRenderer.js?v=5"></script>
+<script src="src/editor/Editor.js?v=5"></script>
 <script>PAM.editor = new PAM.Editor(); PAM.editor.boot();</script>
 </body>
 </html>

@@ -84,7 +84,9 @@ PAM.Config = {
 
   scoring: {
     perfect: 300, good: 200, ok: 100,
-    typeMultiplier: { normal: 1, soft: 1, accent: 1.5, spell: 2 },
+    // by note kind; strong-beat (accent) notes multiply again by `accent`
+    typeMultiplier: { normal: 1, stream: 1, hold: 1, double: 1.2, chord: 1.3, accent: 1.5 },
+    holdTail: 150,          // points for keeping a hold to the end
     comboStep: 10,          // every N combo adds…
     comboBonus: 0.1,        // …this much to the multiplier
     maxComboMultiplier: 2.0
@@ -130,9 +132,54 @@ PAM.Config = {
     }
   },
 
+  // Four lanes: index = lane in the beat map. Colours follow the concept art palette.
+  lanes: [
+    { name: 'UP', key: 'W', thai: 'บน', color: '#5fe3ff' },
+    { name: 'LEFT', key: 'A', thai: 'ซ้าย', color: '#f4c766' },
+    { name: 'DOWN', key: 'S', thai: 'ล่าง', color: '#ff5479' },
+    { name: 'RIGHT', key: 'D', thai: 'ขวา', color: '#8f8bff' }
+  ],
+
+  input: {
+    holdReleaseTolerance: 0.15,  // releasing a hold this close to its end still counts
+    wrongLaneBreaksCombo: false,  // a wrong-lane press shows WRONG KEY; set true to also break the combo
+    wrongLaneWindow: 'good'       // a press counts as wrong-lane if another lane has a note within this window
+  },
+
+  audio: {
+    voice: {
+      cooldown: 2.4,              // seconds of silence after a voice line
+      perfectChance: 0.16,        // chance per PERFECT (once the PERFECT streak >= minPerfectStreak)
+      minPerfectStreak: 3,
+      goodChance: 0.05,
+      missChance: 0.45,           // chance on the first miss after a combo
+      perfectStreakMilestones: [8, 16, 24, 32, 48, 64, 96, 128],
+      duckMusic: 0.84             // music level while a voice line plays (≈ -1.5 dB)
+    },
+    crowd: {
+      introAmbience: 0.5,
+      songAmbience: 0.22,
+      worriedMax: 0.45,
+      maxConcurrent: 4,
+      perfectShoutEvery: 12,
+      booChance: 0.35,
+      spontaneousChance: 0.35,
+      bigEvery: 50                // after combo 100, a big celebration every N combo
+    }
+  },
+
   defaults: {
-    musicVolume: 0.85,
-    sfxVolume: 0.7,
+    volMaster: 1.0,
+    volMusic: 0.85,
+    volFlute: 0.7,
+    volVoice: 0.8,
+    volCrowdAmb: 0.5,
+    volCrowdReact: 0.7,
+    volFootsteps: 0.8,
+    volDanger: 0.7,
+    voiceEnabled: true,
+    crowdEnabled: true,
+    keymap: ['KeyW', 'KeyA', 'KeyS', 'KeyD'],
     difficulty: 'normal',
     songId: 'feltwood_requiem',
     calibrationMs: 0,       // + means the player hits late (input is shifted earlier)
@@ -142,7 +189,8 @@ PAM.Config = {
   },
 
   keys: {
-    hit: ['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyJ', 'KeyF'],
+    // lanes come from settings.keymap (W A S D by default); the arrow keys always work as a second set
+    altLanes: ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight'],
     pause: ['KeyP', 'Escape'],
     fullscreen: ['KeyF11']
   }

@@ -56,7 +56,6 @@ PAM.UI = class UI {
   // ---------------------------------------------------------------- settings
   bindSettings(settings, onChange) {
     const fmt = {
-      musicVolume: v => Math.round(v * 100) + '%', sfxVolume: v => Math.round(v * 100) + '%',
       noteSpeed: v => (+v).toFixed(2) + '×', calibrationMs: v => (v > 0 ? '+' : '') + v + ' ms'
     };
     this.refreshSettings = () => {
@@ -65,6 +64,7 @@ PAM.UI = class UI {
         if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
         const out = el.parentElement.querySelector('output');
         if (out && fmt[k]) out.textContent = fmt[k](v);
+        else if (out && k.startsWith('vol')) out.textContent = Math.round(v * 100) + '%';
       });
     };
     document.querySelectorAll('[data-setting]').forEach(el => {
@@ -78,6 +78,19 @@ PAM.UI = class UI {
       el.addEventListener('keydown', e => { if (e.code === 'Space') e.preventDefault(); });
     });
     this.refreshSettings();
+  }
+
+  /** Key remapping buttons; `waiting` = lane currently waiting for a key press. */
+  renderKeymap(labels, waiting = null) {
+    const box = this.$('keymap');
+    if (!box) return;
+    box.innerHTML = PAM.Config.lanes.map((l, i) =>
+      `<button data-action="remap${i}" class="${waiting === i ? 'waiting' : ''}" style="--lane:${l.color}">` +
+      `<b>${waiting === i ? '…' : labels[i]}</b>${l.thai} · ${l.name}</button>`).join('') +
+      `<button data-action="resetKeys" style="grid-column:span 4;--lane:#9fb0cf">คืนค่าเริ่มต้น W A S D · Reset</button>`;
+    this.$('keymapHint').textContent = waiting === null
+      ? 'คลิกปุ่มแล้วกดคีย์ใหม่ · ลูกศร ↑ ← ↓ → ใช้ได้เสมอเป็นชุดสำรอง · P / Esc = หยุด'
+      : `กดคีย์ที่ต้องการสำหรับเลน ${PAM.Config.lanes[waiting].thai} (${PAM.Config.lanes[waiting].name}) · Esc = ยกเลิก`;
   }
 
   // ---------------------------------------------------------------- song select
@@ -184,9 +197,9 @@ PAM.UI = class UI {
   // ---------------------------------------------------------------- results
   showResults(run, completion, improved, cleared) {
     const won = cleared;
-    this.$('resEyebrow').textContent = won ? 'THE GIANTESS SLEEPS UNDER THE SPELL' : 'THE SEA CLAIMS ITS PRINCE';
+    this.$('resEyebrow').textContent = won ? 'ESCAPE SUCCESSFUL · THE GIANTESS SLEEPS UNDER THE SPELL' : 'THE SEA CLAIMS ITS PRINCE';
     const h = this.$('resTitle');
-    h.textContent = won ? 'ESCAPE SUCCESSFUL' : 'GAME OVER';
+    h.textContent = won ? 'PERFORMANCE COMPLETE' : 'GAME OVER';
     h.className = won ? 'win' : 'lose';
     this.$('resMsg').textContent = won
       ? 'นางผีเสื้อสมุทรหลงใหลในเสียงปี่ จนพระอภัยมณีหลบหนีได้สำเร็จ'
@@ -200,7 +213,8 @@ PAM.UI = class UI {
       ['BEST COMBO', run.bestCombo + (improved.combo ? ' ★' : ''), ''], ['ACCURACY', (run.accuracy * 100).toFixed(1) + '%', ''],
       ['COMPLETION', Math.round(completion * 100) + '%', ''], ['DIFFICULTY', D.label, ''],
       ['PERFECT', run.perfect, 'p'], ['GOOD', run.good, 'g'], ['OK', run.ok, 'o'], ['MISS', run.miss, 'm']
-    ].map(([l, v, c]) => `<div class="${c}"><label>${l}</label><b>${v}</b></div>`).join('');
+    ].map(([l, v, c]) => `<div class="${c}"><label>${l}</label><b>${v}</b></div>`).join('') +
+      `<p class="res-extra" style="grid-column:span 4">HOLD ${run.holdsDone} ✓ / ${run.holdsBroken} ✗ · DOUBLE/CHORD ${run.chords} · WRONG KEY ${run.wrong}</p>`;
     this.show('results');
   }
 };
