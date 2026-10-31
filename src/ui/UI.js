@@ -54,6 +54,9 @@ PAM.UI = class UI {
     this.show(prev, { remember: false });
     return prev;
   }
+  /** Quick fade through black (used when gameplay starts). */
+  fade() { const el = this.$('fade'); el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); }
+
   /** Short notification at the bottom of the screen. */
   toast(text, ms = 3200) {
     const el = this.$('toast');

@@ -392,6 +392,7 @@ PAM.Game = class Game {
     this.music.stop();
     this.applyAudioSettings();
     if (document.activeElement) document.activeElement.blur();
+    this.ui.fade();
 
     const key = this.settings.difficulty, D = PAM.DifficultyManager.get(key);
     let notes = PAM.DifficultyManager.chartFor(this.beatmap, key);
