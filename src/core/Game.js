@@ -20,6 +20,8 @@ PAM.Game = class Game {
     this.canvas = $('scene');
     this.ctx = this.canvas.getContext('2d');
     this.engine = new PAM.RhythmEngine();
+    PAM.AudioManager.init();                         // suspended until the first user gesture
+    this.menuMusic = new PAM.MenuMusic(PAM.AudioManager);
     this.voice = new PAM.VoiceFeedbackManager(PAM.AudioManager);
     this.crowd = new PAM.CrowdManager(PAM.AudioManager);
     this.keysDown = [false, false, false, false];   // physical key state per lane (keydown/keyup)
@@ -72,7 +74,7 @@ PAM.Game = class Game {
     this.resize();
     this.bindInput();
     this.ui.bindSettings(this.settings, key => this.onSettingChanged(key));
-    this.menu = new PAM.MainMenu();
+    this.menu = new PAM.MainMenu(name => this.action(name));
     this.ui.show('menu', { remember: false });
     this.resetScene();
     requestAnimationFrame(now => this.frame(now));
@@ -178,9 +180,10 @@ PAM.Game = class Game {
   saveSettings() { PAM.Storage.saveSettings(this.settings); }
   applyAudioSettings() {
     const s = this.settings, m = s.volMaster;
-    const map = { music: s.volMusic, flute: s.volFlute, voice: s.volVoice, crowdAmb: s.volCrowdAmb, crowdReact: s.volCrowdReact, footsteps: s.volFootsteps, danger: s.volDanger };
+    const map = { music: s.volMusic, flute: s.volFlute, voice: s.volVoice, crowdAmb: s.volCrowdAmb, crowdReact: s.volCrowdReact, footsteps: s.volFootsteps, danger: s.volDanger, menuMusic: s.volMenuMusic, menuSfx: s.volMenuSfx };
     for (const name in map) PAM.AudioManager.setChannelVolume(name, map[name] * m);
     this.music.setVolume(s.volMusic * m);
+    this.menuMusic.setVolume(s.volMenuMusic * m);
     this.voice.enabled = s.voiceEnabled;
     this.crowd.enabled = s.crowdEnabled;
     if (!s.crowdEnabled) this.crowd.stopLoops(0.5);
@@ -222,6 +225,16 @@ PAM.Game = class Game {
     }
   }
 
+  /**
+   * Menu music follows the screens: it plays on the title menu and keeps playing in Options,
+   * fades out when PLAY leads to song select, and is stopped for calibration and gameplay.
+   */
+  onScreen(name) {
+    if (this.run || !name) return this.menuMusic.stop(name ? this.menuMusic.fadeOut : 0.4);
+    if (['menu', 'settings', 'tutorial'].includes(name)) this.menuMusic.start();
+    else this.menuMusic.stop();
+  }
+
   /** Remap screen: assign `code` to the lane waiting for a key (swaps if another lane used it). */
   assignKey(code) {
     const lane = this.remapLane, map = this.settings.keymap;
@@ -256,8 +269,8 @@ PAM.Game = class Game {
       }
       // title menu: Up/Down (or W/S) moves the gold highlight, Enter/Space confirms
       if (this.ui.current === 'menu' && !this.run) {
-        if (['ArrowUp', 'KeyW'].includes(code)) { e.preventDefault(); this.menu.move(-1); return; }
-        if (['ArrowDown', 'KeyS'].includes(code)) { e.preventDefault(); this.menu.move(1); return; }
+        if (['ArrowUp', 'KeyW'].includes(code)) { e.preventDefault(); if (!e.repeat) this.menu.move(-1); return; }
+        if (['ArrowDown', 'KeyS'].includes(code)) { e.preventDefault(); if (!e.repeat) this.menu.move(1); return; }
         if (['Enter', 'NumpadEnter', 'Space'].includes(code)) { e.preventDefault(); if (!e.repeat) this.menu.activate(); return; }
       }
       if (this.ui.current === 'calibrate' && code === 'Space') { e.preventDefault(); if (!e.repeat) this.calib.tap(this.eventTime(e)); return; }
@@ -304,6 +317,10 @@ PAM.Game = class Game {
       if (this.state === this.S.PLAYING) this.release(lane, this.eventTime(e));
     };
     window.addEventListener('pointerup', pointerUp); window.addEventListener('pointercancel', pointerUp);
+    // browsers only allow audio after a user gesture: resume the context and retry the menu music then
+    const unlock = () => PAM.AudioManager.resume().then(() => this.menuMusic.unlock());
+    window.addEventListener('pointerdown', unlock, true);
+    window.addEventListener('keydown', unlock, true);
     document.addEventListener('visibilitychange', () => { if (document.hidden) { this.releaseAllKeys(); this.autoPause(); } });
     window.addEventListener('blur', () => { this.releaseAllKeys(); this.autoPause(); });
   }

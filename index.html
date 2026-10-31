@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Permanent+Marker&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/ui/style.css?v=7">
+<link rel="stylesheet" href="src/ui/style.css?v=8">
 </head>
 <body>
 <div id="viewport">
@@ -110,7 +110,9 @@
       <h3 class="set-h">Audio mixer</h3>
       <div class="settings-grid mixer">
        <label>Master</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volMaster"><output></output></div>
-       <label>Background music</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volMusic"><output></output></div>
+       <label>Menu music</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volMenuMusic"><output></output></div>
+       <label>Menu sound effects</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volMenuSfx"><output></output></div>
+       <label>Game music</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volMusic"><output></output></div>
        <label>Flute &amp; musical FX</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volFlute"><output></output></div>
        <label>Vocal feedback</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volVoice"><output></output><input type="checkbox" data-setting="voiceEnabled" title="On / off"></div>
        <label>Crowd ambience</label><div class="ctl"><input type="range" min="0" max="1" step="0.01" data-setting="volCrowdAmb"><output></output><input type="checkbox" data-setting="crowdEnabled" title="On / off"></div>
@@ -210,44 +212,45 @@
 </div>
 
 <!-- core -->
-<script src="src/core/Config.js?v=7"></script>
-<script src="src/core/Storage.js?v=7"></script>
-<script src="src/core/GameState.js?v=7"></script>
+<script src="src/core/Config.js?v=8"></script>
+<script src="src/core/Storage.js?v=8"></script>
+<script src="src/core/GameState.js?v=8"></script>
 <!-- audio -->
-<script src="src/audio/AudioManager.js?v=7"></script>
-<script src="src/audio/MusicPlayer.js?v=7"></script>
-<script src="src/audio/BeatAnalyzer.js?v=7"></script>
-<script src="src/audio/VoiceFeedback.js?v=7"></script>
-<script src="src/audio/CrowdManager.js?v=7"></script>
-<script src="assets/audio/manifest.js?v=7"></script>
+<script src="src/audio/AudioManager.js?v=8"></script>
+<script src="src/audio/MusicPlayer.js?v=8"></script>
+<script src="src/audio/BeatAnalyzer.js?v=8"></script>
+<script src="src/audio/VoiceFeedback.js?v=8"></script>
+<script src="src/audio/CrowdManager.js?v=8"></script>
+<script src="src/audio/MenuMusic.js?v=8"></script>
+<script src="assets/audio/manifest.js?v=8"></script>
 <!-- rhythm -->
-<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/bionic.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/celestial_storm.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=7"></script>
-<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=7"></script>
-<script src="src/rhythm/BeatMap.js?v=7"></script>
-<script src="src/rhythm/Note.js?v=7"></script>
-<script src="src/rhythm/HitDetector.js?v=7"></script>
-<script src="src/rhythm/RhythmEngine.js?v=7"></script>
+<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/bionic.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/celestial_storm.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=8"></script>
+<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=8"></script>
+<script src="src/rhythm/BeatMap.js?v=8"></script>
+<script src="src/rhythm/Note.js?v=8"></script>
+<script src="src/rhythm/HitDetector.js?v=8"></script>
+<script src="src/rhythm/RhythmEngine.js?v=8"></script>
 <!-- gameplay -->
-<script src="src/gameplay/PursuitController.js?v=7"></script>
-<script src="src/gameplay/ScoreManager.js?v=7"></script>
-<script src="src/gameplay/DifficultyManager.js?v=7"></script>
+<script src="src/gameplay/PursuitController.js?v=8"></script>
+<script src="src/gameplay/ScoreManager.js?v=8"></script>
+<script src="src/gameplay/DifficultyManager.js?v=8"></script>
 <!-- characters + rendering -->
-<script src="src/characters/Rig.js?v=7"></script>
-<script src="src/characters/PhraAphai.js?v=7"></script>
-<script src="src/characters/PhiSueaSamut.js?v=7"></script>
-<script src="src/render/Background.js?v=7"></script>
-<script src="src/render/Effects.js?v=7"></script>
-<script src="src/render/TrackRenderer.js?v=7"></script>
+<script src="src/characters/Rig.js?v=8"></script>
+<script src="src/characters/PhraAphai.js?v=8"></script>
+<script src="src/characters/PhiSueaSamut.js?v=8"></script>
+<script src="src/render/Background.js?v=8"></script>
+<script src="src/render/Effects.js?v=8"></script>
+<script src="src/render/TrackRenderer.js?v=8"></script>
 <!-- ui + game -->
-<script src="src/ui/UI.js?v=7"></script>
-<script src="src/ui/MainMenu.js?v=7"></script>
-<script src="src/ui/Calibration.js?v=7"></script>
-<script src="src/core/Game.js?v=7"></script>
+<script src="src/ui/UI.js?v=8"></script>
+<script src="src/ui/MainMenu.js?v=8"></script>
+<script src="src/ui/Calibration.js?v=8"></script>
+<script src="src/core/Game.js?v=8"></script>
 <script>PAM.game = new PAM.Game(); PAM.game.boot();</script>
 </body>
 </html>

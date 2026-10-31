@@ -15,8 +15,11 @@ PAM.MainMenu = class MainMenu {
     this.onActivate = onActivate;
     this.items = [...document.querySelectorAll('#mainMenu .km-item')];
     this.index = 0;
+    this.confirming = false;
     this.items.forEach((item, i) => {
       item.addEventListener('mouseenter', () => this.select(i));
+      // clicks go through the same confirm path as Enter (sound + flash, then the action)
+      item.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); this.select(i, true); this.activate(); }, true);
       item.addEventListener('focus', () => this.select(i, true));
       for (const c of item.querySelectorAll('canvas.km-plate')) this.paint(c, c.classList.contains('gold'), item.classList.contains('km-play'), i * 7 + 3);
     });
@@ -26,13 +29,25 @@ PAM.MainMenu = class MainMenu {
 
   select(i, silent) {
     i = (i + this.items.length) % this.items.length;
-    if (i !== this.index && !silent && PAM.AudioManager.ctx) PAM.AudioManager.sfx.ui();
+    if (i !== this.index && !silent) PAM.AudioManager.resume().then(() => PAM.AudioManager.sfx.menuMove(i));
     this.index = i;
     this.items.forEach((el, k) => el.classList.toggle('selected', k === i));
   }
 
   move(d) { this.select(this.index + d); }
-  activate() { this.items[this.index].click(); }
+  /** Confirm: stronger sound + a gold flash on the plate, then run the item's action. */
+  activate() {
+    if (this.confirming) return;
+    const item = this.items[this.index];
+    this.confirming = true;
+    PAM.AudioManager.resume().then(() => PAM.AudioManager.sfx.menuConfirm());
+    item.classList.remove('confirmed'); void item.offsetWidth; item.classList.add('confirmed');
+    // fullscreen must run inside the user gesture; the others wait for the flash to land
+    const act = item.dataset.action;
+    const run = () => { this.confirming = false; item.classList.remove('confirmed'); if (this.onActivate) this.onActivate(act); };
+    if (act === 'fullscreen') { run(); item.classList.add('confirmed'); setTimeout(() => item.classList.remove('confirmed'), 450); }
+    else setTimeout(run, 230);
+  }
 
   /** Paint one brush-stroke plate. Deterministic per seed so the menu looks the same every visit. */
   paint(canvas, gold, big, seed) {

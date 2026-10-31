@@ -186,11 +186,22 @@ note follows at any difficulty.
 
 ## 5. Audio: music, flute, voice and crowd
 
+### Menu audio (`src/audio/MenuMusic.js`, menu sounds in `AudioManager.sfx`)
+* **Random menu playlist** built from the game's own songs (`PAM.Config.songs`, nothing added or changed). Each time the main menu opens, a random track starts. It keeps playing in Options, and when it ends the next one crossfades in (3 s). The shuffle is fair (every song plays once before any repeats) and never plays the same song twice in a row; 700 test draws gave exactly 100 per song.
+* Tracks stream through `<audio>` elements into the **Menu music** channel, so even the 34 MB WAV starts without a full decode. A missing or unplayable file is skipped, and if none can play the menu stays silent.
+* Transitions: 2 s fade-in on the menu, 3 s crossfade between tracks, and a 1.2 s fade-out when PLAY is confirmed. Menu music is stopped during calibration and gameplay and comes back with a fresh random track on returning to the menu. Only one track is ever audible apart from the crossfade overlap.
+* **Navigation tick** (Up/Down, W/S or mouse hover): a crisp plucked note whose pitch follows the item. Key-repeat is ignored and ticks are rate-limited to one per 45 ms.
+* **Confirm** (Enter, Space or click): a low thump plus a rising gold chime, with a gold flash on the plate at the same moment. The action runs about 0.23 s later, once the flash has landed; fullscreen runs immediately because browsers require it inside the gesture.
+* **Autoplay rules:** audio starts or resumes on the first click or key press. If the browser refused the menu music before that, it starts then.
+* Both local servers (`Play.bat` / `tools/serve.js`) now support HTTP Range requests, so `<audio>` can seek and report durations, which the crossfade timing needs.
+
 ### Mixer (Settings → Audio mixer, all saved)
 | Channel | What plays there |
 |---|---|
 | Master | everything (followed by a limiter so stacked layers never clip) |
-| Background music | the song, unmodified (pitch and tempo untouched) |
+| Game music | the song during gameplay, unmodified (pitch and tempo untouched) |
+| Menu music | the random menu playlist |
+| Menu sound effects | menu navigation ticks, confirm chime, button clicks |
 | Flute & musical FX | hit accents (pitch follows combo and lane), chord and hold chimes, misses, countdown |
 | Vocal feedback | the Thai voice reactions |
 | Crowd ambience | murmur loops and the worried murmur |

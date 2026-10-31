@@ -16,7 +16,7 @@
  */
 window.PAM = window.PAM || {};
 PAM.AudioManager = (function () {
-  const CHANNELS = ['music', 'flute', 'voice', 'crowdAmb', 'crowdReact', 'footsteps', 'danger'];
+  const CHANNELS = ['music', 'flute', 'voice', 'crowdAmb', 'crowdReact', 'footsteps', 'danger', 'menuMusic', 'menuSfx'];
   let ctx = null, master, limiter, musicFilter, noiseBuf;
   const ch = {};          // name -> { gain, duck }
   const samples = {};     // "group/category" -> [{ url, buffer }]
@@ -293,9 +293,37 @@ PAM.AudioManager = (function () {
       const t = ctx.currentTime;
       [0, 2, 4, 5, 7].forEach((n, i) => osc('sine', PENTATONIC[n], t + i * 0.12, 0.02, 0.06, 1.2));
     },
+    /** Generic UI click (buttons on the other screens). */
     ui() {
       if (!ready()) return;
-      osc('sine', 1320, ctx.currentTime, 0.004, 0.025, 0.08);
+      osc('sine', 1320, ctx.currentTime, 0.004, 0.03, 0.08, 'menuSfx');
+    },
+    /**
+     * Menu navigation tick: a crisp plucked note (pitch climbs with the item index) on top of a
+     * tiny bright transient. Rate-limited so a fast run of key presses never turns into a buzz.
+     */
+    menuMove(index = 0) {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      if (t - (sfx._lastMove || 0) < 0.045) return;
+      sfx._lastMove = t;
+      const f = [783.99, 659.25, 587.33, 523.25][index % 4];
+      osc('triangle', f, t, 0.002, 0.11, 0.09, 'menuSfx');
+      osc('sine', f * 2, t, 0.002, 0.05, 0.06, 'menuSfx');
+      osc('sine', f * 3.01, t, 0.001, 0.02, 0.035, 'menuSfx');
+      noise(t, 0.018, 'highpass', 5200, 0.8, 0.05, 'menuSfx');
+    },
+    /** Menu confirm: a punchy low thump, a rising two-note gold chime and a shimmer tail. */
+    menuConfirm() {
+      if (!ready()) return;
+      const t = ctx.currentTime;
+      osc('sine', 110, t, 0.002, 0.28, 0.22, 'menuSfx').frequency.exponentialRampToValueAtTime(55, t + 0.2);
+      noise(t, 0.05, 'lowpass', 1800, 0.7, 0.12, 'menuSfx');
+      [[523.25, 0], [783.99, 0.07], [1046.5, 0.14]].forEach(([f, d]) => {
+        osc('triangle', f, t + d, 0.003, 0.12, 0.35, 'menuSfx');
+        osc('sine', f * 2, t + d, 0.003, 0.04, 0.3, 'menuSfx');
+      });
+      noise(t + 0.1, 0.5, 'bandpass', 7000, 2, 0.035, 'menuSfx', 11000);
     }
   };
 
@@ -305,6 +333,7 @@ PAM.AudioManager = (function () {
     get ctx() { return ctx; },
     get packMode() { return packMode; },
     get musicInput() { init(); return musicFilter; },
+    get menuMusicInput() { init(); return ch.menuMusic.gain; },
     // kept for MusicPlayer (element fallback reads volumes.music)
     setMusicVolume(v) { setChannelVolume('music', v); },
     channelVolume(name) { return volumes[name] !== undefined ? volumes[name] : 1; },

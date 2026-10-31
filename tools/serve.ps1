@@ -38,7 +38,22 @@ while ($listener.IsListening) {
       $ext = [IO.Path]::GetExtension($path).ToLower()
       $res.ContentType = if ($mime.ContainsKey($ext)) { $mime[$ext] } else { 'application/octet-stream' }
       $res.Headers.Add('Cache-Control', 'no-cache')
+      $res.Headers.Add('Accept-Ranges', 'bytes')
       $bytes = [IO.File]::ReadAllBytes($path)
+      # Range requests let <audio> elements seek and know their duration (menu music crossfades)
+      $range = $ctx.Request.Headers['Range']
+      if ($range -match '^bytes=(\d*)-(\d*)$') {
+        $size = $bytes.Length
+        if ($Matches[1] -ne '') { $start = [long]$Matches[1]; $end = if ($Matches[2] -ne '') { [Math]::Min([long]$Matches[2], $size - 1) } else { $size - 1 } }
+        else { $start = [Math]::Max(0, $size - [long]$Matches[2]); $end = $size - 1 }
+        if ($start -lt $size -and $start -le $end) {
+          $res.StatusCode = 206
+          $res.Headers.Add('Content-Range', "bytes $start-$end/$size")
+          $part = New-Object byte[] ($end - $start + 1)
+          [Array]::Copy($bytes, $start, $part, 0, $part.Length)
+          $bytes = $part
+        }
+      }
     }
     $res.ContentLength64 = $bytes.Length
     $res.OutputStream.Write($bytes, 0, $bytes.Length)

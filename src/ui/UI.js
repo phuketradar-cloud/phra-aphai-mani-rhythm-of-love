@@ -45,6 +45,7 @@ PAM.UI = class UI {
     const art = UI.ART_SCREENS.includes(name) && !this.game.run;
     this.$('menuBg').classList.toggle('hidden', !art);
     this.$('menuBg').classList.toggle('dimmed', name !== 'menu');
+    if (this.game.onScreen) this.game.onScreen(name);
     const first = document.querySelector('#screen-' + name + ' .btn.primary:not([disabled])');
     if (first) setTimeout(() => first.focus({ preventScroll: true }), 30);
   }
@@ -61,7 +62,7 @@ PAM.UI = class UI {
     this.toastTimer = setTimeout(() => el.classList.remove('show'), ms);
   }
 
-  hideScreens() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); this.$('menuBg').classList.add('hidden'); this.current = null; }
+  hideScreens() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); this.$('menuBg').classList.add('hidden'); this.current = null; if (this.game.onScreen) this.game.onScreen(null); }
 
   setHud(visible) { this.$('hud').classList.toggle('hidden', !visible); }
 

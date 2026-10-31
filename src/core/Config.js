@@ -177,6 +177,8 @@ PAM.Config = {
     volCrowdReact: 0.7,
     volFootsteps: 0.8,
     volDanger: 0.7,
+    volMenuMusic: 0.6,
+    volMenuSfx: 0.8,
     voiceEnabled: true,
     crowdEnabled: true,
     keymap: ['KeyW', 'KeyA', 'KeyS', 'KeyD'],
