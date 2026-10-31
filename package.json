@@ -1,0 +1,47 @@
+{
+  "name": "phra-aphai-mani-rhythm-of-love",
+  "productName": "Phra Aphai Mani - Rhythm of Love",
+  "version": "1.0.0",
+  "description": "A 2D Thai folklore rhythm-survival game",
+  "main": "desktop/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build:exe": "electron-builder --win portable --x64"
+  },
+  "build": {
+    "appId": "com.phuketradar.phraaphaimani",
+    "productName": "Phra Aphai Mani - Rhythm of Love",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "editor.html",
+      "package.json",
+      "desktop/**",
+      "src/**",
+      "assets/**",
+      "!assets/beatmaps/*.analysis.json"
+    ],
+    "asar": false,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "desktop/icon.png"
+    },
+    "portable": {
+      "artifactName": "PhraAphaiMani-RhythmOfLove-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^38.8.6",
+    "electron-builder": "^26.18.0"
+  }
+}
