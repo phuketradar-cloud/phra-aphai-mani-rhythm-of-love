@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Permanent+Marker&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/ui/style.css?v=10">
+<link rel="stylesheet" href="src/ui/style.css?v=11">
 </head>
 <body>
 <div id="viewport">
@@ -52,9 +52,9 @@
   <section class="screen" id="screen-menu">
    <img class="km-logo" id="kmLogo" src="assets/menu/logo.webp" alt="Phra Aphai Mani: Rhythm of Love" draggable="false">
    <nav class="km-menu" id="mainMenu" aria-label="Main menu">
-    <button class="km-item km-play selected" data-action="songs" data-index="0"><canvas class="km-plate gold"></canvas><canvas class="km-plate dark"></canvas><span class="km-label">PLAY</span></button>
-    <button class="km-item km-options" data-action="settings" data-index="1"><canvas class="km-plate gold"></canvas><canvas class="km-plate dark"></canvas><span class="km-label">OPTIONS</span></button>
-    <button class="km-item km-full" data-action="fullscreen" data-index="2"><canvas class="km-plate gold"></canvas><canvas class="km-plate dark"></canvas><span class="km-label">FULLSCREEN</span></button>
+    <button class="km-item km-play" data-action="songs" data-index="0"><span class="km-frame"><img src="assets/menu/button_frame.webp" alt="" draggable="false"><span class="km-panel"></span><span class="km-sweep"></span></span><span class="km-label">PLAY</span></button>
+    <button class="km-item km-options" data-action="settings" data-index="1"><span class="km-frame"><img src="assets/menu/button_frame.webp" alt="" draggable="false"><span class="km-panel"></span><span class="km-sweep"></span></span><span class="km-label">OPTIONS</span></button>
+    <button class="km-item km-full" data-action="fullscreen" data-index="2"><span class="km-frame"><img src="assets/menu/button_frame.webp" alt="" draggable="false"><span class="km-panel"></span><span class="km-sweep"></span></span><span class="km-label">FULLSCREEN</span></button>
    </nav>
    <p class="load-status" id="loadStatus">Loading music…</p>
    <p class="km-hint"><kbd>↑</kbd><kbd>↓</kbd> Select &nbsp; <kbd>Enter</kbd> Confirm</p>
@@ -214,46 +214,46 @@
 </div>
 
 <!-- core -->
-<script src="src/core/Config.js?v=10"></script>
-<script src="src/core/Storage.js?v=10"></script>
-<script src="src/core/GameState.js?v=10"></script>
+<script src="src/core/Config.js?v=11"></script>
+<script src="src/core/Storage.js?v=11"></script>
+<script src="src/core/GameState.js?v=11"></script>
 <!-- audio -->
-<script src="src/audio/AudioManager.js?v=10"></script>
-<script src="src/audio/MusicPlayer.js?v=10"></script>
-<script src="src/audio/BeatAnalyzer.js?v=10"></script>
-<script src="src/audio/VoiceFeedback.js?v=10"></script>
-<script src="src/audio/CrowdManager.js?v=10"></script>
-<script src="src/audio/MenuMusic.js?v=10"></script>
-<script src="assets/audio/manifest.js?v=10"></script>
+<script src="src/audio/AudioManager.js?v=11"></script>
+<script src="src/audio/MusicPlayer.js?v=11"></script>
+<script src="src/audio/BeatAnalyzer.js?v=11"></script>
+<script src="src/audio/VoiceFeedback.js?v=11"></script>
+<script src="src/audio/CrowdManager.js?v=11"></script>
+<script src="src/audio/MenuMusic.js?v=11"></script>
+<script src="assets/audio/manifest.js?v=11"></script>
 <!-- rhythm -->
-<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/bionic.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/celestial_storm.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=10"></script>
-<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=10"></script>
-<script src="src/rhythm/BeatMap.js?v=10"></script>
-<script src="src/rhythm/Note.js?v=10"></script>
-<script src="src/rhythm/HitDetector.js?v=10"></script>
-<script src="src/rhythm/RhythmEngine.js?v=10"></script>
+<script src="assets/beatmaps/feltwood_requiem.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/bionic.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/ethereal_requiem.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/echoes_beyond_eternity.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/celestial_storm.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/wings_of_the_forgotten.beatmap.js?v=11"></script>
+<script src="assets/beatmaps/mermaids_lament.beatmap.js?v=11"></script>
+<script src="src/rhythm/BeatMap.js?v=11"></script>
+<script src="src/rhythm/Note.js?v=11"></script>
+<script src="src/rhythm/HitDetector.js?v=11"></script>
+<script src="src/rhythm/RhythmEngine.js?v=11"></script>
 <!-- gameplay -->
-<script src="src/gameplay/PursuitController.js?v=10"></script>
-<script src="src/gameplay/ScoreManager.js?v=10"></script>
-<script src="src/gameplay/DifficultyManager.js?v=10"></script>
+<script src="src/gameplay/PursuitController.js?v=11"></script>
+<script src="src/gameplay/ScoreManager.js?v=11"></script>
+<script src="src/gameplay/DifficultyManager.js?v=11"></script>
 <!-- characters + rendering -->
-<script src="src/characters/Rig.js?v=10"></script>
-<script src="src/characters/PhraAphai.js?v=10"></script>
-<script src="src/characters/PhiSueaSamut.js?v=10"></script>
-<script src="src/render/Background.js?v=10"></script>
-<script src="src/render/Effects.js?v=10"></script>
-<script src="src/render/TrackRenderer.js?v=10"></script>
+<script src="src/characters/Rig.js?v=11"></script>
+<script src="src/characters/PhraAphai.js?v=11"></script>
+<script src="src/characters/PhiSueaSamut.js?v=11"></script>
+<script src="src/render/Background.js?v=11"></script>
+<script src="src/render/Effects.js?v=11"></script>
+<script src="src/render/TrackRenderer.js?v=11"></script>
 <!-- ui + game -->
-<script src="src/ui/UI.js?v=10"></script>
-<script src="src/ui/MenuScene.js?v=10"></script>
-<script src="src/ui/MainMenu.js?v=10"></script>
-<script src="src/ui/Calibration.js?v=10"></script>
-<script src="src/core/Game.js?v=10"></script>
+<script src="src/ui/UI.js?v=11"></script>
+<script src="src/ui/MenuScene.js?v=11"></script>
+<script src="src/ui/MainMenu.js?v=11"></script>
+<script src="src/ui/Calibration.js?v=11"></script>
+<script src="src/core/Game.js?v=11"></script>
 <script>PAM.game = new PAM.Game(); PAM.game.boot();</script>
 </body>
 </html>
