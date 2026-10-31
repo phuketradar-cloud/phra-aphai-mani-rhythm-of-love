@@ -51,7 +51,11 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
 /* ---------- main menu: full-screen key art + painted brush plates ---------- */
 #menuBg { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #05040a; }
 #menuBg.hidden { display: block !important; visibility: hidden; }
-.km-art { position: absolute; inset: -1px; background: url('../../assets/menu/key_art.webp') center / cover no-repeat; animation: kmBreathe 26s ease-in-out infinite alternate; transform-origin: 50% 45%; }
+.km-art { position: absolute; inset: 0; background: #05040a url('../../assets/menu/menu_bg.webp') center / cover no-repeat; }
+#menuFx { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; }
+/* a light shade only behind the logo, for readability */
+.km-shade { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 620px 220px at 905px 130px, rgba(4,6,20,.42), rgba(4,6,20,0) 100%); }
+#menuBg.dimmed .km-shade { display: none; }
 @keyframes kmBreathe { from { transform: scale(1); } to { transform: scale(1.035); } }
 .km-glow { position: absolute; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; }
 .km-glow-moon { left: 120px; top: -40px; width: 440px; height: 440px; background: radial-gradient(circle, rgba(255,236,190,.35), rgba(255,236,190,0) 65%); animation: kmPulse 6s ease-in-out infinite; }
@@ -61,7 +65,7 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
 .km-sparks i { position: absolute; bottom: -20px; width: 5px; height: 5px; border-radius: 50%; background: #ffd57a; box-shadow: 0 0 10px 3px rgba(255,190,80,.7); animation: kmSpark linear infinite; opacity: 0; }
 .km-sparks i.blue { background: #9fd6ff; box-shadow: 0 0 10px 3px rgba(110,180,255,.75); }
 @keyframes kmSpark { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: .9; } 80% { opacity: .6; } 100% { transform: translate(var(--drift), -1000px); opacity: 0; } }
-.km-dim { position: absolute; inset: 0; background: rgba(3,4,12,.62); backdrop-filter: blur(3px); opacity: 0; transition: opacity .35s; }
+.km-dim { position: absolute; inset: 0; background: rgba(3,4,12,.66); opacity: 0; transition: opacity .35s; }
 #menuBg.dimmed .km-dim { opacity: 1; }
 
 #screen-menu { display: block; z-index: 10; }
@@ -72,7 +76,7 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
 .km-item.selected .km-plate.gold { opacity: 1; }
 .km-item.selected .km-plate.dark { opacity: 0; }
 .km-label { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 26px; height: 100%;
-  font: 400 76px/1 'Permanent Marker', 'Impact', sans-serif; letter-spacing: .02em; color: #ead9a4; text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.9); transition: color .2s, text-shadow .2s; }
+  font: 400 76px/1 'Permanent Marker', 'Impact', sans-serif; letter-spacing: .02em; color: #f0cf72; text-shadow: 0 3px 0 #000, 0 0 18px rgba(0,0,0,.9); transition: color .2s, text-shadow .2s; }
 .km-item.selected .km-label { color: #140c04; text-shadow: 0 1px 0 rgba(255,240,190,.6); }
 .km-item.selected { transform: scale(1.06); filter: drop-shadow(0 0 22px rgba(255,190,70,.75)) drop-shadow(0 10px 18px rgba(0,0,0,.8)); animation: kmGlow 1.8s ease-in-out infinite; }
 @keyframes kmGlow { 0%, 100% { filter: drop-shadow(0 0 16px rgba(255,190,70,.55)) drop-shadow(0 10px 18px rgba(0,0,0,.8)); } 50% { filter: drop-shadow(0 0 34px rgba(255,205,90,.95)) drop-shadow(0 10px 18px rgba(0,0,0,.8)); } }
@@ -80,11 +84,18 @@ kbd { font: 600 0.85em var(--font-ui); border: 1px solid #6c7fa6; border-bottom-
   background: linear-gradient(105deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%); background-size: 250% 100%; mix-blend-mode: overlay; animation: kmSweep 2.6s ease-in-out infinite; }
 @keyframes kmSweep { 0% { background-position: 120% 0; } 60%, 100% { background-position: -120% 0; } }
 .km-tri { width: 0; height: 0; border-top: 30px solid transparent; border-bottom: 30px solid transparent; border-left: 46px solid currentColor; }
-/* plate positions sit exactly over the plates painted into the key art (1920 x 1080 stage) */
-.km-play    { left: 520px; top: 536px; width: 900px; height: 166px; }
-.km-play .km-label { font-size: 104px; }
-.km-options { left: 640px; top: 700px; width: 660px; height: 128px; }
-.km-full    { left: 640px; top: 828px; width: 660px; height: 128px; }
+/* layout over the title artwork (1920 x 1080 stage): logo upper-centre, menu between the two
+   characters, below the musical notes and clear of the flute, both faces and the giantess's hand */
+.km-logo { position: absolute; left: 545px; top: 22px; width: 720px; height: 235px; object-fit: contain; z-index: 2; pointer-events: none; user-select: none;
+  filter: drop-shadow(0 0 10px rgba(255,200,90,.35)) drop-shadow(0 6px 14px rgba(0,0,0,.7)); animation: kmLogo 7s ease-in-out infinite; }
+@keyframes kmLogo { 0%, 100% { filter: drop-shadow(0 0 8px rgba(255,200,90,.28)) drop-shadow(0 6px 14px rgba(0,0,0,.7)) brightness(1); }
+  50% { filter: drop-shadow(0 0 22px rgba(255,205,100,.55)) drop-shadow(0 6px 14px rgba(0,0,0,.7)) brightness(1.06); } }
+.km-play    { left: 676px; top: 640px; width: 460px; height: 118px; }
+.km-play .km-label { font-size: 74px; gap: 18px; }
+.km-play .km-tri { border-top-width: 22px; border-bottom-width: 22px; border-left-width: 34px; }
+.km-options { left: 706px; top: 770px; width: 400px; height: 92px; }
+.km-full    { left: 706px; top: 868px; width: 400px; height: 92px; }
+.km-options .km-label, .km-full .km-label { font-size: 50px; }
 .load-status { position: absolute; left: 0; right: 0; bottom: 34px; margin: 0; text-align: center; font: 600 18px var(--font-ui); letter-spacing: .08em; color: rgba(225,215,190,.75); text-shadow: 0 2px 6px #000; }
 .km-hint { position: absolute; right: 44px; bottom: 30px; margin: 0; font: 600 17px var(--font-ui); color: rgba(225,215,190,.7); text-shadow: 0 2px 6px #000; }
 .km-hint kbd { margin: 0 2px; }

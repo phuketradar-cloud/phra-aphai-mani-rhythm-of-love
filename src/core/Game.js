@@ -75,6 +75,9 @@ PAM.Game = class Game {
     this.bindInput();
     this.ui.bindSettings(this.settings, key => this.onSettingChanged(key));
     this.menu = new PAM.MainMenu(name => this.action(name));
+    this.menuScene = new PAM.MenuScene(document.getElementById('menuFx'));
+    this.menuScene.resize(this.k);
+    this.menuScene.start();
     this.ui.show('menu', { remember: false });
     this.resetScene();
     requestAnimationFrame(now => this.frame(now));
@@ -174,6 +177,7 @@ PAM.Game = class Game {
     this.canvas.width = Math.round(W * this.k);
     this.canvas.height = Math.round(H * this.k);
     this.bg.resize(this.k);
+    if (this.menuScene) this.menuScene.resize(this.k);
   }
 
   // =================================================================== settings

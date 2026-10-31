@@ -17,7 +17,7 @@
 window.PAM = window.PAM || {};
 PAM.AudioManager = (function () {
   const CHANNELS = ['music', 'flute', 'voice', 'crowdAmb', 'crowdReact', 'footsteps', 'danger', 'menuMusic', 'menuSfx'];
-  let ctx = null, master, limiter, musicFilter, noiseBuf;
+  let ctx = null, master, limiter, musicFilter, noiseBuf, menuAnalyser, menuBuf;
   const ch = {};          // name -> { gain, duck }
   const samples = {};     // "group/category" -> [{ url, buffer }]
   let clockOffset = null; // smoothed (contextTime - performanceTime) in seconds
@@ -40,6 +40,9 @@ PAM.AudioManager = (function () {
     }
     musicFilter = ctx.createBiquadFilter(); musicFilter.type = 'lowpass'; musicFilter.frequency.value = 22000; musicFilter.Q.value = 0.7;
     musicFilter.connect(ch.music.gain);
+    // level meter on the menu music (drives the title screen's music-energy glow)
+    menuAnalyser = ctx.createAnalyser(); menuAnalyser.fftSize = 1024;
+    ch.menuMusic.duck.connect(menuAnalyser);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -334,6 +337,14 @@ PAM.AudioManager = (function () {
     get packMode() { return packMode; },
     get musicInput() { init(); return musicFilter; },
     get menuMusicInput() { init(); return ch.menuMusic.gain; },
+    /** RMS level of the menu music, roughly 0..1. */
+    menuLevel() {
+      if (!menuAnalyser || ctx.state !== 'running') return 0;
+      if (!menuBuf) menuBuf = new Float32Array(menuAnalyser.fftSize);
+      menuAnalyser.getFloatTimeDomainData(menuBuf);
+      let s = 0; for (let i = 0; i < menuBuf.length; i++) s += menuBuf[i] * menuBuf[i];
+      return Math.min(1, Math.sqrt(s / menuBuf.length) * 4);
+    },
     // kept for MusicPlayer (element fallback reads volumes.music)
     setMusicVolume(v) { setChannelVolume('music', v); },
     channelVolume(name) { return volumes[name] !== undefined ? volumes[name] : 1; },
