@@ -72,6 +72,7 @@ PAM.Game = class Game {
     this.resize();
     this.bindInput();
     this.ui.bindSettings(this.settings, key => this.onSettingChanged(key));
+    this.menu = new PAM.MainMenu();
     this.ui.show('menu', { remember: false });
     this.resetScene();
     requestAnimationFrame(now => this.frame(now));
@@ -79,9 +80,9 @@ PAM.Game = class Game {
     document.getElementById('musicFile').addEventListener('change', async e => {
       const f = e.target.files[0], song = this.song;
       if (!f) return;
-      this.ui.setAudioStatus('กำลังถอดรหัสเสียง ' + f.name + '…', { ready: false, fallback: true });
+      this.ui.setAudioStatus('Decoding ' + f.name + '…', { ready: false, fallback: true });
       try { await this.music.loadFile(f); this.loadState[song.id] = 'ready'; this.applyAudioSettings(); this.onMusicReady('webaudio'); }
-      catch (err) { this.ui.setAudioStatus('ไฟล์นี้เล่นไม่ได้: ' + err.message, { ready: false, fallback: true }); }
+      catch (err) { this.ui.setAudioStatus('This file cannot be played: ' + err.message, { ready: false, fallback: true }); }
       e.target.value = '';
     });
 
@@ -143,21 +144,21 @@ PAM.Game = class Game {
     this.music = this.playerFor(song);
     this.beatmap = this.beatmaps[song.id] || null;
     this.renderSongSelect();
-    if (this.loadState[song.id] !== 'ready') this.ui.setAudioStatus(`กำลังโหลดเพลง ${song.title}…`, { ready: false, fallback: false });
+    if (this.loadState[song.id] !== 'ready') this.ui.setAudioStatus(`Loading ${song.title}…`, { ready: false, fallback: false });
     await this.loadSong(song);
     if (this.song !== song) return;            // the player picked another song meanwhile
     this.beatmap = this.beatmaps[song.id] || null;
     const st = this.loadState[song.id];
-    if (st === 'nomap') this.ui.setAudioStatus(`ไม่พบ Beat Map ของเพลง ${song.title}`, { ready: false, fallback: false });
-    else if (st === 'error') this.ui.setAudioStatus('โหลดไฟล์เพลงไม่สำเร็จ — กรุณาเลือกไฟล์เพลงด้านล่าง หรือเปิดด้วย Play.bat', { ready: false, fallback: true });
+    if (st === 'nomap') this.ui.setAudioStatus(`No beat map found for ${song.title}`, { ready: false, fallback: false });
+    else if (st === 'error') this.ui.setAudioStatus('Could not load the music. Choose the file below or start the game with Play.bat.', { ready: false, fallback: true });
     else { this.applyAudioSettings(); this.onMusicReady(this.music.mode); }
     this.renderSongSelect();
   }
 
   onMusicReady(mode) {
     const d = this.music.duration;
-    const note = mode === 'element' ? ' · โหมดสำรอง (file://) — แนะนำให้เปิดผ่าน Play.bat เพื่อความแม่นยำสูงสุด' : '';
-    this.ui.setAudioStatus(`พร้อมเล่น ♪ ${this.song.title} (${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')})${note}`, { ready: true, fallback: false });
+    const note = mode === 'element' ? ' · fallback mode (file://), use Play.bat for the most accurate timing' : '';
+    this.ui.setAudioStatus(`Ready ♪ ${this.song.title} (${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')})${note}`, { ready: true, fallback: false });
     if (this.params.has('autostart')) this.startSong();
   }
 
@@ -235,7 +236,9 @@ PAM.Game = class Game {
 
   toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
-    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+    else if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => this.ui.toast('This browser blocked fullscreen. Press F11 instead.'));
+    } else this.ui.toast('Fullscreen is not supported here. Press F11 instead.');
   }
 
   // =================================================================== input
@@ -250,6 +253,12 @@ PAM.Game = class Game {
         if (code === 'Escape') { this.remapLane = null; this.ui.renderKeymap(this.keyLabels()); }
         else if (!['KeyP', 'F11'].includes(code)) this.assignKey(code);
         return;
+      }
+      // title menu: Up/Down (or W/S) moves the gold highlight, Enter/Space confirms
+      if (this.ui.current === 'menu' && !this.run) {
+        if (['ArrowUp', 'KeyW'].includes(code)) { e.preventDefault(); this.menu.move(-1); return; }
+        if (['ArrowDown', 'KeyS'].includes(code)) { e.preventDefault(); this.menu.move(1); return; }
+        if (['Enter', 'NumpadEnter', 'Space'].includes(code)) { e.preventDefault(); if (!e.repeat) this.menu.activate(); return; }
       }
       if (this.ui.current === 'calibrate' && code === 'Space') { e.preventDefault(); if (!e.repeat) this.calib.tap(this.eventTime(e)); return; }
       const lane = this.laneFor(code);
@@ -603,7 +612,7 @@ PAM.Game = class Game {
     const dur = this.music.duration;
     if (!this.finalAnnounced && t > dur * 0.86 && !finished) {
       this.finalAnnounced = true;
-      this.fx.popup('FINAL VERSE · ท่อนสุดท้าย', 960, 430, '#ff8aa0', 52, 1.6);
+      this.fx.popup('FINAL VERSE', 960, 430, '#ff8aa0', 52, 1.6);
     }
 
     // audience: excitement follows the performance, tension follows the danger
@@ -624,7 +633,7 @@ PAM.Game = class Game {
     const left = start - t;
     let label = null, go = false;
     if (left > 0) label = String(Math.ceil(left));
-    else if (left > -0.7 && this.state !== this.S.RESUMING) { label = 'เริ่ม!'; go = true; }
+    else if (left > -0.7 && this.state !== this.S.RESUMING) { label = 'PLAY!'; go = true; }
     if (label !== this.lastCount) {
       if (label) PAM.AudioManager.sfx.countdown(go);
       this.lastCount = label;
@@ -695,7 +704,7 @@ PAM.Game = class Game {
       if (Math.random() < dt * 40) this.fx.bubble(200 + Math.random() * 1520, 1100);
       this.zoom = 1 + (T - 1.9) * 0.03;
     }
-    if (T > 2.6 && !this.ui.$('banner').innerHTML) this.ui.banner('GAME OVER', 'ถูกจับ…พาลงทะเล', 'lose');
+    if (T > 2.6 && !this.ui.$('banner').innerHTML) this.ui.banner('GAME OVER', 'Dragged beneath the waves…', 'lose');
     if (T > 5.2) this.finish(false);
   }
 
@@ -731,7 +740,7 @@ PAM.Game = class Game {
       this.crowd.celebrate();
       this.voice.say('celebrate', { priority: 3, force: true, excitement: 1 });
       PAM.AudioManager.sfx.victory();
-      this.ui.banner('PERFORMANCE COMPLETE', 'การแสดงจบลงอย่างงดงาม · นางยักษ์หลับใหลในมนตร์เสียงปี่ หลบหนีสำเร็จ!');
+      this.ui.banner('PERFORMANCE COMPLETE', 'The giantess sleeps under the spell · Escape successful!');
       for (let i = 0; i < 40; i++) this.fx.sparkle(960, 520, i % 2 ? '#f6d88c' : '#bfe9ff');
     }
     if (T > 0.7) {

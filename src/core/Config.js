@@ -12,7 +12,7 @@ PAM.Config = {
     {
       id: 'feltwood_requiem',
       title: 'Feltwood Requiem',
-      subtitle: 'บทเพลงสะกดนางผีเสื้อสมุทร',
+      subtitle: 'The song that spellbinds the sea giantess',
       audio: ['assets/music/Feltwood Requiem.wav'],
       beatmap: 'assets/beatmaps/feltwood_requiem.json',
       art: [300, 0, 860, 345]          // crop of assets/concept/concept_sheet.webp for the song card
@@ -20,7 +20,7 @@ PAM.Config = {
     {
       id: 'bionic',
       title: 'Bionic',
-      subtitle: 'ท่วงทำนองจากห้วงทะเลลึก',
+      subtitle: 'A melody rising from the deep sea',
       audio: ['assets/music/bionic.mp3'],
       beatmap: 'assets/beatmaps/bionic.json',
       art: [418, 768, 340, 198]
@@ -28,7 +28,7 @@ PAM.Config = {
     {
       id: 'ethereal_requiem',
       title: 'Ethereal Requiem',
-      subtitle: 'บทเพลงไว้อาลัยแห่งวิญญาณ',
+      subtitle: 'A requiem for wandering souls',
       audio: ['assets/music/ethereal_requiem.mp3'],
       beatmap: 'assets/beatmaps/ethereal_requiem.json',
       art: [196, 752, 192, 198]
@@ -36,7 +36,7 @@ PAM.Config = {
     {
       id: 'echoes_beyond_eternity',
       title: 'Echoes Beyond Eternity',
-      subtitle: 'เสียงสะท้อนเหนือนิรันดร์',
+      subtitle: 'Voices that outlast forever',
       audio: ['assets/music/echoes_beyond_eternity.mp3'],
       beatmap: 'assets/beatmaps/echoes_beyond_eternity.json',
       art: [18, 752, 174, 198]
@@ -44,7 +44,7 @@ PAM.Config = {
     {
       id: 'celestial_storm',
       title: 'Celestial Storm',
-      subtitle: 'พายุแห่งสรวงสวรรค์',
+      subtitle: 'A storm across the heavens',
       audio: ['assets/music/celestial_storm.mp3'],
       beatmap: 'assets/beatmaps/celestial_storm.json',
       art: [24, 395, 870, 320]
@@ -52,7 +52,7 @@ PAM.Config = {
     {
       id: 'wings_of_the_forgotten',
       title: 'Wings of the Forgotten',
-      subtitle: 'ปีกแห่งผู้ถูกลืม',
+      subtitle: 'Wings of those the world forgot',
       audio: ['assets/music/wings_of_the_forgotten.mp3'],
       beatmap: 'assets/beatmaps/wings_of_the_forgotten.json',
       art: [1022, 797, 188, 150]
@@ -60,7 +60,7 @@ PAM.Config = {
     {
       id: 'mermaids_lament',
       title: "The Mermaid's Lament",
-      subtitle: 'เพลงคร่ำครวญของนางเงือก',
+      subtitle: 'The mermaid mourns beneath the moon',
       audio: ['assets/music/mermaids_lament.mp3'],
       beatmap: 'assets/beatmaps/mermaids_lament.json',
       art: [1276, 384, 244, 244]
@@ -116,28 +116,28 @@ PAM.Config = {
 
   DIFFICULTIES: {
     easy: {
-      label: 'EASY', thai: 'ง่าย', level: 1, timingScale: 1.3,
+      label: 'EASY', level: 1, timingScale: 1.3,
       stepScale: 0.7, chaseScale: 0.65, recoverScale: 1.6, spellLossScale: 0.7,
-      description: 'โน้ตน้อย หน้าต่างจังหวะกว้าง ฟื้นตัวง่าย'
+      description: 'Fewer notes, no chords, wide timing windows, easy recovery'
     },
     normal: {
-      label: 'NORMAL', thai: 'ปกติ', level: 2, timingScale: 1.0,
+      label: 'NORMAL', level: 2, timingScale: 1.0,
       stepScale: 1.0, chaseScale: 1.0, recoverScale: 1.0, spellLossScale: 1.0,
-      description: 'ความหนาแน่นโน้ตปานกลาง สมดุล'
+      description: 'Balanced density with doubles on strong beats'
     },
     hard: {
-      label: 'HARD', thai: 'ยาก', level: 3, timingScale: 0.8,
+      label: 'HARD', level: 3, timingScale: 0.8,
       stepScale: 1.25, chaseScale: 1.35, recoverScale: 0.6, spellLossScale: 1.3,
-      description: 'โน้ตถี่ หน้าต่างแคบ นางยักษ์เร่งเร็ว'
+      description: 'Dense chords and streams, tight timing, a faster giantess'
     }
   },
 
   // Four lanes: index = lane in the beat map. Colours follow the concept art palette.
   lanes: [
-    { name: 'UP', key: 'W', thai: 'บน', color: '#5fe3ff' },
-    { name: 'LEFT', key: 'A', thai: 'ซ้าย', color: '#f4c766' },
-    { name: 'DOWN', key: 'S', thai: 'ล่าง', color: '#ff5479' },
-    { name: 'RIGHT', key: 'D', thai: 'ขวา', color: '#8f8bff' }
+    { name: 'UP', key: 'W', color: '#5fe3ff' },
+    { name: 'LEFT', key: 'A', color: '#f4c766' },
+    { name: 'DOWN', key: 'S', color: '#ff5479' },
+    { name: 'RIGHT', key: 'D', color: '#8f8bff' }
   ],
 
   input: {

@@ -172,7 +172,7 @@ PAM.TrackRenderer = class TrackRenderer {
       ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.font = "800 54px 'Cinzel', serif"; ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,10,0.7)';
       ctx.strokeText(opts.combo, 0, 0); ctx.shadowColor = milestone; ctx.shadowBlur = 20 + this.comboPop * 30; ctx.fillStyle = milestone; ctx.fillText(opts.combo, 0, 0);
-      ctx.shadowBlur = 0; ctx.font = "700 16px 'Cinzel', serif"; ctx.fillStyle = 'rgba(230,236,250,0.85)'; ctx.fillText('COMBO · ต่อเนื่อง', 0, 22);
+      ctx.shadowBlur = 0; ctx.font = "700 16px 'Cinzel', serif"; ctx.fillStyle = 'rgba(230,236,250,0.85)'; ctx.fillText('COMBO', 0, 22);
       ctx.restore();
     }
     ctx.restore();

@@ -5,6 +5,7 @@
  */
 window.PAM = window.PAM || {};
 PAM.UI = class UI {
+  static get ART_SCREENS() { return ['menu', 'songs', 'settings', 'tutorial', 'calibrate']; }
   constructor(game) {
     this.game = game;
     this.current = 'menu';
@@ -13,7 +14,6 @@ PAM.UI = class UI {
     this.$ = id => document.getElementById(id);
 
     // concept-sheet crops (source rectangles in the 1536x1024 sheet)
-    this.crop(this.$('artBanner'), 0, 0, 1160, 345, 800, 238);
     this.crop(this.$('artTut2'), 916, 392, 196, 86, 470, 230, 'cover');
     this.crop(this.$('artTut3'), 196, 752, 192, 196, 470, 230, 'cover');
 
@@ -41,6 +41,10 @@ PAM.UI = class UI {
     if (this.history.length > 10) this.history.shift();
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('hidden', s.id !== 'screen-' + name));
     this.current = name;
+    // the key art stays behind the menu-side screens; it is dimmed everywhere except the title menu
+    const art = UI.ART_SCREENS.includes(name) && !this.game.run;
+    this.$('menuBg').classList.toggle('hidden', !art);
+    this.$('menuBg').classList.toggle('dimmed', name !== 'menu');
     const first = document.querySelector('#screen-' + name + ' .btn.primary:not([disabled])');
     if (first) setTimeout(() => first.focus({ preventScroll: true }), 30);
   }
@@ -49,7 +53,15 @@ PAM.UI = class UI {
     this.show(prev, { remember: false });
     return prev;
   }
-  hideScreens() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); this.current = null; }
+  /** Short notification at the bottom of the screen. */
+  toast(text, ms = 3200) {
+    const el = this.$('toast');
+    el.textContent = text; el.classList.add('show');
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  hideScreens() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); this.$('menuBg').classList.add('hidden'); this.current = null; }
 
   setHud(visible) { this.$('hud').classList.toggle('hidden', !visible); }
 
@@ -86,11 +98,11 @@ PAM.UI = class UI {
     if (!box) return;
     box.innerHTML = PAM.Config.lanes.map((l, i) =>
       `<button data-action="remap${i}" class="${waiting === i ? 'waiting' : ''}" style="--lane:${l.color}">` +
-      `<b>${waiting === i ? '…' : labels[i]}</b>${l.thai} · ${l.name}</button>`).join('') +
-      `<button data-action="resetKeys" style="grid-column:span 4;--lane:#9fb0cf">คืนค่าเริ่มต้น W A S D · Reset</button>`;
+      `<b>${waiting === i ? '…' : labels[i]}</b>${l.name}</button>`).join('') +
+      `<button data-action="resetKeys" style="grid-column:span 4;--lane:#9fb0cf">Reset to W A S D</button>`;
     this.$('keymapHint').textContent = waiting === null
-      ? 'คลิกปุ่มแล้วกดคีย์ใหม่ · ลูกศร ↑ ← ↓ → ใช้ได้เสมอเป็นชุดสำรอง · P / Esc = หยุด'
-      : `กดคีย์ที่ต้องการสำหรับเลน ${PAM.Config.lanes[waiting].thai} (${PAM.Config.lanes[waiting].name}) · Esc = ยกเลิก`;
+      ? 'Click a lane, then press a new key. Arrow keys always work as a second set. P / Esc pauses.'
+      : `Press the new key for the ${PAM.Config.lanes[waiting].name} lane. Esc cancels.`;
   }
 
   // ---------------------------------------------------------------- song select
@@ -102,8 +114,8 @@ PAM.UI = class UI {
       const r = PAM.Storage.getRecord(s.id, difficulty), st = state(s.id);
       const b = document.createElement('button');
       b.className = 'song-item' + (s === current ? ' active' : '');
-      const status = st === 'error' || st === 'nomap' ? 'โหลดไม่สำเร็จ'
-        : st === 'loading' || (s === current && st !== 'ready') ? 'กำลังโหลด…'
+      const status = st === 'error' || st === 'nomap' ? 'LOAD FAILED'
+        : st === 'loading' || (s === current && st !== 'ready') ? 'LOADING…'
         : r.cleared ? 'CLEAR ✓' : r.highScore ? 'BEST ' + r.highScore.toLocaleString() : 'NEW';
       b.innerHTML = `<b>${s.title}</b><span>${s.subtitle}</span><em>${status}</em>`;
       b.addEventListener('click', () => { if (s !== current) { PAM.AudioManager.sfx.ui(); onSelect(s.id); } });
@@ -114,7 +126,7 @@ PAM.UI = class UI {
     this.$('songTitle').textContent = current.title;
     this.$('songSubtitle').textContent = current.subtitle;
     // cleared here, filled by renderSongSelect once this song's beat map is loaded
-    this.$('songMeta').innerHTML = '<span class="chip">กำลังโหลด…</span>';
+    this.$('songMeta').innerHTML = '<span class="chip">Loading…</span>';
     this.$('diffTabs').innerHTML = ''; this.$('songRecords').innerHTML = ''; this.$('diffDesc').textContent = '';
   }
 
@@ -136,13 +148,13 @@ PAM.UI = class UI {
       const b = document.createElement('button');
       b.className = 'diff-tab' + (key === difficulty ? ' active' : '');
       b.dataset.diff = key;
-      b.innerHTML = `<b>${D.label}</b><span>${D.thai} · ${n} โน้ต</span><div class="stars">${stars}</div>`;
+      b.innerHTML = `<b>${D.label}</b><span>${n} notes</span><div class="stars">${stars}</div>`;
       b.addEventListener('click', () => { PAM.AudioManager.sfx.ui(); onPick(key); });
       tabs.appendChild(b);
     }
     const D = PAM.DifficultyManager.get(difficulty);
     const w = PAM.Config.timing;
-    this.$('diffDesc').textContent = `${D.description} · หน้าต่างจังหวะ PERFECT ±${Math.round(w.perfect * D.timingScale * 1000)}ms / GOOD ±${Math.round(w.good * D.timingScale * 1000)}ms / OK ±${Math.round(w.ok * D.timingScale * 1000)}ms`;
+    this.$('diffDesc').textContent = `${D.description} · Timing windows: PERFECT ±${Math.round(w.perfect * D.timingScale * 1000)}ms / GOOD ±${Math.round(w.good * D.timingScale * 1000)}ms / OK ±${Math.round(w.ok * D.timingScale * 1000)}ms`;
     const r = PAM.Storage.getRecord(song.id, difficulty);
     this.$('songRecords').innerHTML = [
       ['HIGH SCORE', r.highScore.toLocaleString()], ['BEST COMBO', r.bestCombo],
@@ -202,8 +214,8 @@ PAM.UI = class UI {
     h.textContent = won ? 'PERFORMANCE COMPLETE' : 'GAME OVER';
     h.className = won ? 'win' : 'lose';
     this.$('resMsg').textContent = won
-      ? 'นางผีเสื้อสมุทรหลงใหลในเสียงปี่ จนพระอภัยมณีหลบหนีได้สำเร็จ'
-      : 'นางผีเสื้อสมุทรจับพระอภัยมณีพาลงทะเล — The giantess has captured Phra Aphai Mani.';
+      ? 'Phi Suea Samut is lost in the music, and Phra Aphai Mani escapes.'
+      : 'The giantess has captured Phra Aphai Mani and dragged him into the sea.';
     if (won) this.crop(this.$('artResult'), 640, 20, 520, 330, 460, 640, 'cover');
     else this.crop(this.$('artResult'), 1276, 384, 244, 244, 460, 640, 'cover');
     this.$('resScore').textContent = run.score.toLocaleString();

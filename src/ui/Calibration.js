@@ -19,7 +19,7 @@ PAM.Calibration = class Calibration {
     this.result = null;
     this.ui.$('btnCalibApply').disabled = true;
     this.ui.$('calibCount').textContent = '—';
-    this.ui.$('calibResult').textContent = `ค่าปัจจุบัน: ${currentMs > 0 ? '+' : ''}${currentMs} ms`;
+    this.ui.$('calibResult').textContent = `Current offset: ${currentMs > 0 ? '+' : ''}${currentMs} ms`;
   }
 
   async start() {
@@ -65,7 +65,7 @@ PAM.Calibration = class Calibration {
     cancelAnimationFrame(this.raf);
     this.ui.$('calibPulse').classList.remove('on');
     if (this.taps.length < 6) {
-      this.ui.$('calibResult').textContent = `กดได้ ${this.taps.length} ครั้ง — น้อยเกินไป ลองใหม่อีกครั้ง`;
+      this.ui.$('calibResult').textContent = `Only ${this.taps.length} taps counted. Please try again.`;
       return;
     }
     const sorted = this.taps.slice().sort((a, b) => a - b);
@@ -73,7 +73,7 @@ PAM.Calibration = class Calibration {
     const mean = trimmed.reduce((a, b) => a + b, 0) / trimmed.length;
     this.result = Math.round(mean * 1000);
     this.ui.$('calibCount').textContent = (this.result > 0 ? '+' : '') + this.result + ' ms';
-    this.ui.$('calibResult').textContent = `คุณกด${this.result > 0 ? 'ช้ากว่า' : 'เร็วกว่า'}เสียงเฉลี่ย ${Math.abs(this.result)} ms (${this.taps.length} ครั้ง) — กด “ใช้ค่านี้” เพื่อบันทึก`;
+    this.ui.$('calibResult').textContent = `On average you press ${Math.abs(this.result)} ms ${this.result > 0 ? 'late' : 'early'} (${this.taps.length} taps). Press APPLY to save it.`;
     this.ui.$('btnCalibApply').disabled = false;
   }
 

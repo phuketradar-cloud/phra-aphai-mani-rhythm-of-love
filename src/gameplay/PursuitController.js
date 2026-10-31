@@ -92,13 +92,13 @@ PAM.PursuitController = class PursuitController {
   /** Human-readable status for the HUD. */
   get status() {
     switch (this.mood) {
-      case 'mesmerized': return { th: 'นางยักษ์ต้องมนตร์เสียงขลุ่ย', en: 'MESMERIZED', level: 0 };
-      case 'idle': return { th: 'นางยักษ์หยุดฟัง…', en: 'LISTENING', level: 1 };
-      case 'slowWalk': return { th: 'นางยักษ์ก้าวเข้ามา', en: 'APPROACHING', level: 2 };
-      case 'fastWalk': return { th: 'นางยักษ์เร่งฝีเท้า!', en: 'HUNTING', level: 3 };
-      case 'running': return { th: 'นางยักษ์วิ่งไล่!', en: 'CHARGING', level: 4 };
-      case 'attack': return { th: 'นางยักษ์เอื้อมมือคว้า!!', en: 'REACHING', level: 5 };
-      default: return { th: 'ถูกจับแล้ว', en: 'CAUGHT', level: 5 };
+      case 'mesmerized': return { th: 'The giantess is spellbound', en: 'MESMERIZED', level: 0 };
+      case 'idle': return { th: 'She pauses to listen…', en: 'LISTENING', level: 1 };
+      case 'slowWalk': return { th: 'She steps closer', en: 'APPROACHING', level: 2 };
+      case 'fastWalk': return { th: 'She quickens her pace!', en: 'HUNTING', level: 3 };
+      case 'running': return { th: 'She is charging!', en: 'CHARGING', level: 4 };
+      case 'attack': return { th: 'She reaches for him!!', en: 'REACHING', level: 5 };
+      default: return { th: 'Captured', en: 'CAUGHT', level: 5 };
     }
   }
 };

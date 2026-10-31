@@ -33,6 +33,8 @@ Use a current Chrome, Edge or Firefox on desktop. The first click or key press u
 
 ## 2. Controls
 
+**Main menu:** a full-screen key-art title screen with only **PLAY**, **OPTIONS** and **FULLSCREEN**. Use the mouse, or **Up/Down** (or W/S) and **Enter**; **Esc** returns from Options. The interface is English only. Timing calibration is under Options → *Measure*, and the beat map editor is at `editor.html` (not linked from the menu). The menu plates are painted at runtime over the plates in `assets/menu/key_art.webp`. If you replace the art, adjust the `.km-play / .km-options / .km-full` positions in `src/ui/style.css`. If a browser refuses fullscreen, a notice suggests F11.
+
 | Action | Keys |
 |---|---|
 | Lane UP / LEFT / DOWN / RIGHT | `W` `A` `S` `D` (remappable in Settings). The arrow keys `↑` `←` `↓` `→` always work as a second set. Mouse/touch: press on a lane row. |
