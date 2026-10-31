@@ -86,5 +86,14 @@ async function createWindow() {
   }
 }
 
-app.whenReady().then(createWindow);
+// one copy at a time: launching again (e.g. a second double-click while it loads) focuses the open window
+// (the --selftest run skips this so a build can be checked while the game is open)
+if (!process.argv.some(a => a.startsWith('--selftest=')) && !app.requestSingleInstanceLock()) app.quit();
+else {
+  app.on('second-instance', () => {
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
+  });
+  app.whenReady().then(createWindow);
+}
 app.on('window-all-closed', () => app.quit());

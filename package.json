@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "build:exe": "electron-builder --win portable --x64"
+    "build:exe": "electron-builder --win nsis portable --x64"
   },
   "build": {
     "appId": "com.phuketradar.phraaphaimani",
@@ -28,6 +28,12 @@
     "win": {
       "target": [
         {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
           "target": "portable",
           "arch": [
             "x64"
@@ -36,8 +42,18 @@
       ],
       "icon": "desktop/icon.png"
     },
+    "nsis": {
+      "artifactName": "PhraAphaiMani-RhythmOfLove-Setup-${version}.exe",
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Phra Aphai Mani - Rhythm of Love",
+      "runAfterFinish": true
+    },
     "portable": {
-      "artifactName": "PhraAphaiMani-RhythmOfLove-${version}.exe"
+      "artifactName": "PhraAphaiMani-RhythmOfLove-${version}.exe",
+      "splashImage": "desktop/splash.bmp"
     }
   },
   "devDependencies": {
