@@ -375,7 +375,7 @@ PAM.Game = class Game {
   // =================================================================== run lifecycle
   resetScene() {
     this.prince.override = null; this.giant.override = null;
-    this.prince.scale = PRINCE_SCALE; this.giant.scale = GIANT_SCALE; this.prince.beat = null;
+    this.prince.scale = PRINCE_SCALE; this.giant.scale = GIANT_SCALE; this.prince.beat = null; this.giant.lastX = null;
     this.prince.setState(this.state === this.S.MENU ? 'play' : 'idle');
     this.giant.setState('mesmerized');
     this.pursuit.reset(PAM.DifficultyManager.get(this.settings.difficulty));
@@ -617,7 +617,10 @@ PAM.Game = class Game {
     if (this.state !== this.S.PLAYING) return;   // an event may have ended the run
 
     // giantess follows the pursuit model; after the last note she is lost in the music
-    this.giant.x = this.giantX(this.pursuit.pursuitDistance);
+    // she glides toward her pursuit position (no jumps when a hit pushes her back), so her
+    // distance-driven steps stay smooth: accelerating, slowing and stepping back naturally
+    const gx = this.giantX(this.pursuit.pursuitDistance);
+    this.giant.x += (gx - this.giant.x) * Math.min(1, dt * 6);
     const finished = this.engine.allJudged && t > this.engine.lastNoteTime;
     this.giant.setState(t < 0 ? 'mesmerized' : finished ? 'mesmerized' : this.pursuit.mood);
     this.giant.reachTarget = this.prince.bodyCenter;

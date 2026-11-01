@@ -42,7 +42,15 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     return (PAM.PhiSueaSamut._sprites = set);
   }
 
-  setState(s) { if (s !== this.state) this.stateT = 0; this.state = s; }
+  setState(s) {
+    if (s !== this.state) {
+      // re-entering the attack right after one (e.g. the capture starting) keeps the lunge going
+      // instead of crouching and leaping a second time
+      this.stateT = s === 'attack' && this.t - (this.attackAt || -9) < 1 ? 0.35 : 0;
+    }
+    this.state = s;
+    if (s === 'attack') this.attackAt = this.t;
+  }
   flinch() { this.flinchT = 0; }
 
   gait() {
@@ -83,12 +91,25 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     this.t += dt; this.flinchT += dt; this.stateT += dt;
     const key = this.poseFor();
     if (key !== this.poseKey) { this.prevKey = this.poseKey; this.poseKey = key; this.fade = 0; }
-    this.fade = Math.min(1, this.fade + dt / (key === 'attack' || key === 'run' ? 0.12 : 0.3));
+    // leaving or entering the enchanted pose takes longer (hands come down, eyes open)
+    const fadeTime = key === 'attack' || key === 'run' ? 0.12 : (key === 'mesmerized' || this.prevKey === 'mesmerized') ? 0.55 : 0.3;
+    this.fade = Math.min(1, this.fade + dt / fadeTime);
     const g = this.gait();
     const prev = this.phase;
-    this.phase += g.speed * dt;
+    // ground distance covered this frame (moving left = forward)
+    const moved = this.lastX == null || this.override ? 0 : this.lastX - this.x;
+    this.lastX = this.x;
+    if (key === 'walk' && this.drawsSprites) {
+      // painted walk: steps come from the distance actually walked, so planted feet never slide;
+      // pushed back by the music she steps backwards. Standing still she settles onto both feet.
+      const stepWorld = PAM.PhiSueaSamut.SPRITES.walk.step * PAM.PhiSueaSamut.SPRITE_SCALE * this.scale;
+      if (Math.abs(moved) > 0.02) this.phase += moved / stepWorld * Math.PI;
+      else this.phase += (Math.round(this.phase / Math.PI) * Math.PI - this.phase) * Math.min(1, dt * 5);
+    } else {
+      this.phase += g.speed * dt;
+    }
     // a foot lands every half cycle
-    if (g.speed > 0 && Math.floor(prev / Math.PI) !== Math.floor(this.phase / Math.PI) && this.onStep) this.onStep(g.intensity);
+    if (prev !== this.phase && Math.floor(prev / Math.PI) !== Math.floor(this.phase / Math.PI) && this.onStep) this.onStep(Math.max(0.2, g.intensity));
     const target = this.targetPose();
     target.stride = g.stride;
     PAM.Rig.blend(this.pose, target, dt, this.state === 'attack' || this.state === 'running' ? 10 : 5);
@@ -117,7 +138,8 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
   poseFor() {
     switch (this.state) {
       case 'mesmerized': return 'mesmerized';
-      case 'attack': return this.stateT < 0.22 ? 'run' : 'attack';
+      // crouch (on the walk pose), leap, then the roaring lunge
+      case 'attack': return this.stateT < 0.12 ? 'walk' : this.stateT < 0.3 ? 'run' : 'attack';
       case 'capture': return 'attack';
       default: return 'walk';
     }
@@ -125,14 +147,16 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
 
   draw(ctx) {
     const s = this.sprites;
-    if (s.walk.every(f => f.ok) && s.mesmerized.ok && s.run.ok && s.attack.ok) this.drawSprites(ctx); else this.drawRig(ctx);
+    this.drawsSprites = s.walk.every(f => f.ok) && s.mesmerized.ok && s.run.ok && s.attack.ok;
+    if (this.drawsSprites) this.drawSprites(ctx); else this.drawRig(ctx);
   }
 
   /** Walk frame for the gait phase: frame 0 / 4 = a foot landing (phase 0 / π, when onStep fires). */
   walkFrame() {
     const f = ((this.phase / Math.PI * 4) % 8 + 8) % 8, i = Math.floor(f), frac = f - i;
-    // hold each frame, then cross-fade into the next during the last part of the step
-    const k = Math.max(0, Math.min(1, (frac - 0.5) / 0.5));
+    // hold each frame briefly, then cross-fade into the next for most of the step (a long blend
+    // hides how differently the hair is painted from frame to frame)
+    const k = Math.max(0, Math.min(1, (frac - 0.3) / 0.7));
     return { a: this.sprites.walk[i], b: this.sprites.walk[(i + 1) % 8], mix: k * k * (3 - 2 * k) };
   }
 
@@ -173,8 +197,14 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
   drawSprites(ctx) {
     const p = this.pose, t = this.t, S = PAM.PhiSueaSamut.SPRITE_SCALE, set = this.sprites;
     const st = p.stride || 0;
-    const lift = (p.bob || 0) + (p.crouch || 0) * 18 - Math.abs(Math.sin(this.phase)) * 7 * st;
-    const leanOf = key => key === 'walk' ? -(p.lean || 0) * 0.45 : key === 'mesmerized' ? -(p.sway || 0) * 0.4 : -(p.lean || 0) * 0.15;
+    // anticipation: a quick crouch-and-lean-back before she leaps at him
+    const at = this.state === 'attack' ? this.stateT : 9;
+    const antic = at < 0.12 ? Math.sin(at / 0.12 * Math.PI / 2) : at < 0.2 ? 1 - (at - 0.12) / 0.08 : 0;
+    // recoil when a note hits her: she rocks back for a moment
+    const recoil = this.flinchT < 0.5 ? Math.sin(this.flinchT / 0.5 * Math.PI) : 0;
+    const lift = (p.bob || 0) + (p.crouch || 0) * 18 - Math.abs(Math.sin(this.phase)) * 7 * st + antic * 24;
+    const leanOf = key => (key === 'walk' ? -(p.lean || 0) * 0.45 : key === 'mesmerized' ? -(p.sway || 0) * 0.4 : -(p.lean || 0) * 0.15)
+      + antic * 0.1 + recoil * 0.07;
     const place = (key) => {
       ctx.translate(this.x, this.y);
       if (this.override) { ctx.translate(this.override.dx, this.override.dy); ctx.rotate(this.override.rot); }
@@ -522,11 +552,12 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
 PAM.PhiSueaSamut.SPRITE_SCALE = 0.72;
 /**
  * Anchor points in sprite pixels: foot = ground point under the pelvis, hip = waist height,
- * head / chest / hands / eye = what effects, the music notes and the capture aim at.
+ * head / chest / hands / eye = what effects, the music notes and the capture aim at;
+ * walk.step = ground distance (pixels) covered by one step of the walk cycle.
  * All 8 walk frames share one canvas registered on the face, so they share their anchors.
  */
 PAM.PhiSueaSamut.SPRITES = {
-  walk:       { foot: [110, 633], hip: 290, head: [100, 85], chest: [110, 190], hands: [85, 335], eye: [86, 92] },
+  walk:       { step: 150, foot: [110, 633], hip: 290, head: [100, 85], chest: [110, 190], hands: [85, 335], eye: [86, 92] },
   mesmerized: { foot: [85, 625],  hip: 270, head: [65, 75],  chest: [80, 170],  hands: [55, 160] },
   run:        { foot: [160, 568], hip: 260, head: [75, 85],  chest: [110, 185], hands: [15, 180], eye: [85, 98] },
   attack:     { foot: [230, 548], hip: 250, head: [130, 80], chest: [180, 170], hands: [35, 140], eye: [110, 90] }
