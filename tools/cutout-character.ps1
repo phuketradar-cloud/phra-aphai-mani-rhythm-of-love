@@ -8,8 +8,10 @@
 #   run        : -BBox 580,120,540,760 -Seed 800,600 -Hair 700,120,280,340 -Scale 0.83 -Erase 808,680,30,30
 #   attack     : -BBox 960,150,540,730 -Seed 1250,600 -Hair 1125,150,330,330 -Scale 0.83 -Erase 1133,540,30,30,1416,571,30,30
 # Her walk cycle came with a transparent background: tools/split-frames.ps1 -Frames 8 -Prefix walk_
-# Keep -BBox and -Scale unchanged when re-cutting: the sprite anchor points depend on them.# Cut a figure out of a white-background sheet with proper edge matting.
-#  -BBox  : exact output rectangle in the sheet (x,y,w,h) โ€” kept identical so sprite anchors stay valid
+# Keep -BBox and -Scale unchanged when re-cutting: the sprite anchor points depend on them.
+
+# Cut a figure out of a white-background sheet with proper edge matting.
+#  -BBox  : exact output rectangle in the sheet (x,y,w,h) - kept identical so sprite anchors stay valid
 #  -Seed  : a point on the figure (sheet coords)
 #  -Hair  : rectangle (sheet coords) where small white specks between strands are removed too
 #  -Scale : final resize factor
