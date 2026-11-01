@@ -3,8 +3,8 @@
  * Builds the vocal-feedback and crowd sample packs (run once; the game only plays the files).
  *   node tools/build-audio.js
  *
- * 1. Voices: tools/voice-src/*.wav (Thai clips rendered offline by tools/render-voices.ps1)
- *    -> trimmed, normalized, slightly brightened, short room tail -> assets/audio/voice/<category>/
+ * 1. Voices: tools/voice-src/*.wav (English announcer lines rendered offline by tools/render-voices-en.py)
+ *    -> trimmed, arena-announcer treatment (presence, drive, stadium echo) -> assets/audio/voice/<category>/
  * 2. Crowd: synthesized procedurally (no recordings needed) -> assets/audio/crowd/<category>/
  *    murmur loops, applause (small/medium/large), cheers, whistles, gasps, groans, boos, celebration
  * 3. assets/audio/manifest.json + manifest.js (file:// copy) listing every sample per category.
@@ -243,10 +243,33 @@ function celebration(seed) {
   return normalize(fadeEdges(out, 0.01, 1.2), 0.85);
 }
 
+/**
+ * Arena-announcer treatment: tight low cut, presence + air so it cuts through the music, a warm
+ * saturation stage that makes it loud and punchy (like a shouted PA call), then stadium slap-back
+ * echoes and a short room.
+ */
+function announcer(d) {
+  const hp = new Biquad('hp', 140, 0.7), pres = new Biquad('bp', 2700, 1.1), air = new Biquad('bp', 6200, 1.4);
+  for (let i = 0; i < d.length; i++) { const x = hp.run(d[i]); d[i] = x + pres.run(x) * 0.85 + air.run(x) * 0.35; }
+  normalize(d, 0.9);
+  const drive = 2.6, k = Math.tanh(drive);
+  for (let i = 0; i < d.length; i++) d[i] = Math.tanh(d[i] * drive) / k;
+  // stadium PA: a few delayed, darker repeats
+  const taps = [[0.11, 0.3], [0.23, 0.19], [0.37, 0.11], [0.53, 0.06]];
+  const tail = Math.floor(0.75 * SR), out = new Float32Array(d.length + tail), wet = new Float32Array(out.length);
+  out.set(d);
+  for (const [t, g] of taps) { const o = Math.floor(t * SR); for (let i = 0; i < d.length; i++) wet[i + o] += d[i] * g; }
+  const lp = new Biquad('lp', 2600, 0.7);
+  for (let i = 0; i < out.length; i++) out[i] += lp.run(wet[i]);
+  return normalize(fadeEdges(room(out, 0.2, 0.35), 0.005, 0.25), 0.95);
+}
+
 // ------------------------------------------------------------------ build
 function buildVoices() {
   const src = path.join(__dirname, 'voice-src');
-  if (!fs.existsSync(src)) { console.log('voice-src missing: run tools/render-voices.ps1 first (skipping voices)'); return; }
+  if (!fs.existsSync(src)) { console.log('voice-src missing: run tools/render-voices-en.py first (skipping voices)'); return; }
+  // the voice folders hold only what this build writes (old lines in another language are removed)
+  fs.rmSync(path.join(OUT, 'voice'), { recursive: true, force: true });
   for (const f of fs.readdirSync(src).filter(f => f.endsWith('.wav'))) {
     const [cat] = f.split('_');
     const w = readWav(path.join(src, f));
@@ -256,10 +279,7 @@ function buildVoices() {
     while (a < b && Math.abs(d[a]) < th) a++;
     while (b > a && Math.abs(d[b]) < th) b--;
     d = d.slice(Math.max(0, a - Math.floor(0.01 * SR)), Math.min(d.length, b + Math.floor(0.03 * SR)));
-    // presence boost (excited, cuts through the music) then a short room so it sits "in the audience"
-    const hp = new Biquad('hp', 160, 0.7), pres = new Biquad('bp', 2800, 1.2);
-    for (let i = 0; i < d.length; i++) { const x = hp.run(d[i]); d[i] = x + pres.run(x) * 0.6; }
-    d = normalize(fadeEdges(room(d, 0.22, 0.3)), 0.85);
+    d = announcer(d);
     writeWav(path.join(OUT, 'voice', cat, f), d);
   }
 }
@@ -288,7 +308,7 @@ function buildCrowd() {
 }
 
 function buildManifest() {
-  const manifest = { version: 1, voice: {}, crowd: {} };
+  const manifest = { version: 2, voice: {}, crowd: {} };   // bump when samples change (cache busting)
   for (const group of ['voice', 'crowd']) {
     const dir = path.join(OUT, group);
     if (!fs.existsSync(dir)) continue;

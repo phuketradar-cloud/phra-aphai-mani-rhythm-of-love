@@ -154,7 +154,8 @@ PAM.Config = {
       goodChance: 0.05,
       missChance: 0.45,           // chance on the first miss after a combo
       perfectStreakMilestones: [8, 16, 24, 32, 48, 64, 96, 128],
-      duckMusic: 0.84             // music level while a voice line plays (≈ -1.5 dB)
+      duckMusic: 0.6,             // music level while the announcer shouts (≈ -4.4 dB)
+      gain: 1.25                  // announcer level (the master limiter catches peaks)
     },
     crowd: {
       introAmbience: 0.5,

@@ -203,7 +203,7 @@ note follows at any difficulty.
 | Menu music | the random menu playlist |
 | Menu sound effects | menu navigation ticks, confirm chime, button clicks |
 | Flute & musical FX | hit accents (pitch follows combo and lane), chord and hold chimes, misses, countdown |
-| Vocal feedback | the Thai voice reactions |
+| Vocal feedback | the English announcer reactions |
 | Crowd ambience | murmur loops and the worried murmur |
 | Crowd reactions | applause, cheers, whistles, gasps, groans, boos, celebration |
 | Giantess footsteps | steps, synced to her walk cycle (faster when she runs) |
@@ -225,8 +225,10 @@ ambience to 55%. Big celebrations dip the music a little more. The music always 
 * Shuffle bags (no immediate repeats), a 2.4 s global cooldown, and one voice at a time: a
   higher-priority line may cut a lower one with a short fade, otherwise the new line is skipped.
 * **No text-to-speech at runtime.** The clips are audio files. They were generated offline with
-  the Windows Thai voice (Microsoft Pattara) by `tools/render-voices.ps1`, then trimmed,
-  normalised and given a short room tail by `tools/build-audio.js`.
+  the Microsoft neural voice en-US-GuyNeural (edge-tts) by `tools/render-voices-en.py`, then
+  trimmed and given an arena-announcer treatment (presence boost, drive, stadium slap-back echo)
+  by `tools/build-audio.js`. While a line plays the music is ducked to 60 % so the announcer cuts
+  through. (`tools/render-voices.ps1` still renders the older Thai lines with Windows' Pattara voice.)
 
 ### Crowd Manager (`src/audio/CrowdManager.js`)
 * **Song start:** louder anticipation chatter with a few claps and a whistle. When the music
@@ -303,7 +305,7 @@ src/characters Rig.js (pose blending, 2-bone IK) · PhraAphai.js · PhiSueaSamut
 src/render    Background.js · Effects.js · TrackRenderer.js
 src/ui        UI.js · Calibration.js · style.css
 src/editor    Editor.js
-tools         analyze-song.js · convert-4lane.js · render-voices.ps1 · build-audio.js · serve.ps1 · serve.js
+tools         analyze-song.js · convert-4lane.js · render-voices-en.py · render-voices.ps1 · build-audio.js · serve.ps1 · serve.js
 assets        music/ · beatmaps/ · audio/voice/ · audio/crowd/ · concept/ · characters/ · backgrounds/ · effects/ · fonts/
 ```
 All tunable numbers (timing windows, pursuit, difficulty scales, scoring, lane colours, hold
@@ -357,8 +359,8 @@ calibration (+36 ms measured for taps 30 ms late); `file://` fallback for music 
 * **Sound effects are synthesized** with Web Audio (flute accent, hit, miss, footsteps, heartbeat,
   roar, impact, grab, splash). They are mixed under the music. Swap them for recorded samples in
   `AudioManager.sfx` if you have them.
-* **Voice reactions are generated, not recorded:** pre-rendered offline with the Windows Thai
-  text-to-speech voice (Pattara) at excited pitch and speed settings. They are proper audio files
+* **Voice reactions are generated, not recorded:** pre-rendered offline with a Microsoft neural
+  English voice (en-US-GuyNeural) at excited pitch and speed settings, plus announcer processing. They are proper audio files
   (no TTS at runtime), but they sound synthetic next to a real person shouting. Replace them with
   real recordings when you have them (see §5); the system needs no changes.
 * **The crowd is synthesized**, not recorded: applause and whistles are fairly convincing,

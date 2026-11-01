@@ -1,5 +1,5 @@
 /*
- * VoiceFeedbackManager — short Thai vocal reactions (pre-recorded/pre-generated samples only).
+ * VoiceFeedbackManager — short English hype-announcer reactions (pre-recorded/pre-generated samples only).
  *
  * Rules (all numbers in PAM.Config.audio.voice):
  *  - never a voice on every note: chance + milestones + a global cooldown
@@ -7,7 +7,7 @@
  *    otherwise the new line is skipped (no unintelligible overlaps)
  *  - shuffle bags per category, so the same sample is never picked twice in a row
  *  - excitement: during a PERFECT streak the lines play slightly faster/higher and louder
- *  - while a voice plays, the music and crowd ambience are ducked a little (music stays in front)
+ *  - while a voice plays, the music and crowd ambience are ducked so the announcer cuts through
  */
 window.PAM = window.PAM || {};
 PAM.VoiceFeedbackManager = class VoiceFeedbackManager {
@@ -56,13 +56,13 @@ PAM.VoiceFeedbackManager = class VoiceFeedbackManager {
     const sample = this.pick(category);
     if (!sample) return false;
     const rate = 1 + Math.min(0.12, excitement * 0.12);
-    const gain = 0.85 + Math.min(0.15, excitement * 0.15);
+    const gain = this.C.gain * (0.9 + Math.min(0.2, excitement * 0.2));
     const handle = this.audio.play(sample, 'voice', { gain, rate, pan: (Math.random() - 0.5) * 0.5 });
     if (!handle) return false;
     const dur = handle.duration;
     this.current = { handle, priority, until: t + dur };
     this.cooldownUntil = t + dur + this.C.cooldown * (priority >= 2 ? 0.6 : 1);
-    this.audio.duck({ music: this.C.duckMusic, crowdAmb: 0.55, crowdReact: 0.75 }, dur);
+    this.audio.duck({ music: this.C.duckMusic, crowdAmb: 0.45, crowdReact: 0.7 }, dur);
     this.lastCategory = category;
     this.log.push({ t: +t.toFixed(2), category, file: sample.url.split('/').pop(), priority });
     if (this.log.length > 40) this.log.shift();
