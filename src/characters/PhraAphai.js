@@ -1,9 +1,14 @@
 /*
  * PhraAphai — Phra Aphai Mani, the flute-playing prince (left side, faces right).
  *
- * Layered skeletal 2D character drawn procedurally on canvas. Gameplay code only calls
- * setState(), react(), update() and draw(); to replace the artwork with sprite sheets,
- * keep that interface (see README "Replacing character artwork").
+ * Drawn from painted full-body sprites (assets/characters/phra_aphai/), one per pose:
+ *   idle   — standing, flute held at his side       (state idle)
+ *   play   — playing the flute                      (states play, nervous)
+ *   scared — recoiling with a raised hand           (states panic, caught, pulled)
+ * The pose values below (bob, lean, sway, shake…) move the whole sprite around its feet, and pose
+ * changes cross-fade. Until the images load (or if one is missing) the original procedural
+ * skeletal figure is drawn instead (drawRig).
+ * Gameplay code only calls setState(), react(), update() and draw().
  *
  * States: idle | play | nervous | panic | caught | pulled
  * One-shot reactions layered on top: 'success' (hit) and 'miss'.
@@ -19,6 +24,27 @@ PAM.PhraAphai = class PhraAphai {
     this.fluteTip = { x: 0, y: 0 };   // world position where music notes are emitted
     this.bodyCenter = { x: 0, y: 0 }; // world position the giantess reaches for
     this.override = null;             // capture cinematic transform {dx, dy, rot}
+    this.sprites = PAM.PhraAphai.loadSprites();
+    this.spriteKey = 'idle'; this.prevKey = null; this.fade = 1;
+  }
+
+  /** Load the pose images once (shared by every instance). */
+  static loadSprites() {
+    if (PAM.PhraAphai._sprites) return PAM.PhraAphai._sprites;
+    const set = {};
+    for (const [key, def] of Object.entries(PAM.PhraAphai.SPRITES)) {
+      const img = new Image();
+      set[key] = Object.assign({ img, ok: false }, def);
+      img.onload = () => { set[key].ok = true; };
+      img.src = def.src;
+    }
+    return (PAM.PhraAphai._sprites = set);
+  }
+
+  spriteFor(state) {
+    if (state === 'play' || state === 'nervous') return 'play';
+    if (state === 'panic' || state === 'caught' || state === 'pulled') return 'scared';
+    return 'idle';
   }
 
   setState(s) { this.state = s; }
@@ -48,9 +74,76 @@ PAM.PhraAphai = class PhraAphai {
     this.reactT += dt;
     const fast = this.state === 'panic' || this.state === 'caught';
     PAM.Rig.blend(this.pose, this.targetPose(), dt, fast ? 14 : 7);
+    const key = this.spriteFor(this.state);
+    if (key !== this.spriteKey) { this.prevKey = this.spriteKey; this.spriteKey = key; this.fade = 0; }
+    this.fade = Math.min(1, this.fade + dt / 0.18);
   }
 
   draw(ctx) {
+    const cur = this.sprites[this.spriteKey];
+    if (cur && cur.ok) this.drawSprites(ctx); else this.drawRig(ctx);
+  }
+
+  /** Painted sprites: the whole figure sways, leans, breathes and trembles around its feet. */
+  drawSprites(ctx) {
+    const p = this.pose, t = this.t, S = PAM.PhraAphai.SPRITE_SCALE;
+    const shake = p.shake ? Math.sin(t * 60) * p.shake : 0;
+    const rot = ((p.lean || 0) + (p.sway || 0)) * 0.55;
+    const lift = (p.bob || 0) + (p.knee || 0) * 6;
+    const breathe = 1 + Math.sin(t * 2.1) * 0.006;
+    // character-local frame: origin between the feet, before this.scale / override
+    const place = () => {
+      ctx.translate(this.x, this.y);
+      if (this.override) { ctx.translate(this.override.dx, this.override.dy); ctx.rotate(this.override.rot); }
+      ctx.scale(this.scale, this.scale);
+      ctx.translate(shake, lift);
+      ctx.rotate(rot);
+      ctx.scale(S, S * breathe);
+    };
+    const drawOne = (sp, alpha) => {
+      if (!sp || !sp.ok || alpha <= 0) return;
+      ctx.save(); place(); ctx.globalAlpha = alpha;
+      if (sp.flip) ctx.scale(-1, 1);
+      ctx.drawImage(sp.img, -sp.foot[0], -sp.foot[1]);
+      ctx.restore();
+    };
+    // soft contact shadow
+    ctx.save();
+    ctx.translate(this.x + (this.override ? this.override.dx : 0), this.y + (this.override ? this.override.dy : 0));
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(0, 4, 62 * this.scale, 11 * this.scale, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    const cur = this.sprites[this.spriteKey];
+    if (this.fade < 1) drawOne(this.sprites[this.prevKey], 1 - this.fade);
+    drawOne(cur, this.fade < 1 ? this.fade : 1);
+
+    // world-space anchors for effects / the giantess
+    const toWorld = q => {
+      let x = (cur.flip ? cur.foot[0] - q[0] : q[0] - cur.foot[0]) * S, y = (q[1] - cur.foot[1]) * S * breathe;
+      const c0 = Math.cos(rot), s0 = Math.sin(rot);
+      [x, y] = [x * c0 - y * s0 + shake, x * s0 + y * c0 + lift];
+      x *= this.scale; y *= this.scale;
+      if (this.override) {
+        const c = Math.cos(this.override.rot), s = Math.sin(this.override.rot);
+        [x, y] = [x * c - y * s + this.override.dx, x * s + y * c + this.override.dy];
+      }
+      return { x: this.x + x, y: this.y + y };
+    };
+    this.fluteTip = toWorld(cur.flute);
+    this.bodyCenter = toWorld(cur.chest);
+    this.headPos = toWorld(cur.head);
+
+    // the flute glows while it is being played
+    if (this.spriteKey === 'play') {
+      const g = ctx.createRadialGradient(this.fluteTip.x, this.fluteTip.y, 0, this.fluteTip.x, this.fluteTip.y, 26);
+      g.addColorStop(0, `rgba(140,230,255,${0.45 + Math.sin(t * 5) * 0.12})`); g.addColorStop(1, 'rgba(140,230,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.fluteTip.x, this.fluteTip.y, 26, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  /** Original procedural skeletal figure (fallback while the sprites load). */
+  drawRig(ctx) {
     const R = PAM.Rig, p = this.pose, t = this.t;
     ctx.save();
     ctx.translate(this.x, this.y);
@@ -236,4 +329,17 @@ PAM.PhraAphai = class PhraAphai {
     this.bodyCenter = toWorld({ x: sh.x, y: (sh.y + hip.y) / 2 });
     this.headPos = toWorld(head);
   }
+};
+
+/** World units per sprite pixel (before this.scale); the sprites are stored at about 2x display size. */
+PAM.PhraAphai.SPRITE_SCALE = 0.5;
+/**
+ * Pose images and their anchor points in image pixels:
+ * foot = ground point between the feet, flute = where music notes leave, chest = what the
+ * giantess grabs, head = head centre. flip mirrors the image so he faces right (the sea).
+ */
+PAM.PhraAphai.SPRITES = {
+  idle:   { src: 'assets/characters/phra_aphai/idle.png?v=1',   foot: [113, 600], flute: [179, 172], chest: [95, 150],  head: [105, 60], flip: true },
+  play:   { src: 'assets/characters/phra_aphai/play.png?v=1',   foot: [128, 596], flute: [226, 107], chest: [111, 150], head: [131, 60] },
+  scared: { src: 'assets/characters/phra_aphai/scared.png?v=1', foot: [150, 581], flute: [16, 240],  chest: [114, 150], head: [104, 60] }
 };
