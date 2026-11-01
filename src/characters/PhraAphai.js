@@ -444,7 +444,7 @@ PAM.PhraAphai.SPRITE_SCALE = 0.5;
  * giantess grabs, head = head centre. flip mirrors the image so he faces right (the sea).
  */
 PAM.PhraAphai.SPRITES = {
-  idle:   { src: 'assets/characters/phra_aphai/idle.png?v=1',   foot: [113, 600], flute: [179, 172], chest: [95, 150],  head: [105, 60], hip: 215, neck: 100, cx: 110, bodyW: 48, flip: true },
-  play:   { src: 'assets/characters/phra_aphai/play.png?v=1',   foot: [128, 596], flute: [226, 107], chest: [111, 150], head: [131, 60], hip: 222, neck: 105, cx: 118, bodyW: 50 },
-  scared: { src: 'assets/characters/phra_aphai/scared.png?v=1', foot: [150, 581], flute: [16, 240],  chest: [114, 150], head: [104, 60], hip: 222, neck: 100, cx: 150, bodyW: 62 }
+  idle:   { src: 'assets/characters/phra_aphai/idle.png?v=2',   foot: [113, 600], flute: [179, 172], chest: [95, 150],  head: [105, 60], hip: 215, neck: 100, cx: 110, bodyW: 48, flip: true },
+  play:   { src: 'assets/characters/phra_aphai/play.png?v=2',   foot: [128, 596], flute: [226, 107], chest: [111, 150], head: [131, 60], hip: 222, neck: 105, cx: 118, bodyW: 50 },
+  scared: { src: 'assets/characters/phra_aphai/scared.png?v=2', foot: [150, 581], flute: [16, 240],  chest: [114, 150], head: [104, 60], hip: 222, neck: 100, cx: 150, bodyW: 62 }
 };
