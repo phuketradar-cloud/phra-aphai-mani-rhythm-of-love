@@ -3,7 +3,12 @@
 #   play   : -In <sheet 1> -BBox 11,11,469,1232 -Seed 250,750 -Hair 0,0,360,200 -Scale 0.484 -Erase 325,105,28,30
 #   idle   : -In <sheet 2> -BBox 12,7,319,1010  -Seed 200,650 -Hair 0,0,336,170 -Scale 0.594 -Erase 275,400,30,55,262,75,22,30
 #   scared : -In <sheet 2> -BBox 336,92,528,916 -Seed 606,650 -Hair 376,0,220,240 -Scale 0.634
-# Keep -BBox and -Scale unchanged when re-cutting: the anchor points in PhraAphai.SPRITES depend on them.# Cut a figure out of a white-background sheet with proper edge matting.
+# Phi Suea Samut poses (pose sheet; then trimmed to visible pixels — offsets 7,25 / 13,26 / 12,27):
+#   mesmerized : -BBox 5,60,320,820   -Seed 150,600  -Hair 130,60,190,460  -Scale 0.83 -Erase 275,610,30,30
+#   run        : -BBox 580,120,540,760 -Seed 800,600 -Hair 700,120,280,340 -Scale 0.83 -Erase 808,680,30,30
+#   attack     : -BBox 960,150,540,730 -Seed 1250,600 -Hair 1125,150,330,330 -Scale 0.83 -Erase 1133,540,30,30,1416,571,30,30
+# Her walk cycle came with a transparent background: tools/split-frames.ps1 -Frames 8 -Prefix walk_
+# Keep -BBox and -Scale unchanged when re-cutting: the sprite anchor points depend on them.# Cut a figure out of a white-background sheet with proper edge matting.
 #  -BBox  : exact output rectangle in the sheet (x,y,w,h) โ€” kept identical so sprite anchors stay valid
 #  -Seed  : a point on the figure (sheet coords)
 #  -Hair  : rectangle (sheet coords) where small white specks between strands are removed too
@@ -37,7 +42,7 @@ public static class Cut2 {
     // 1b. hand-marked gaps (sheet-coord rects x,y,w,h): their light pixels are background
     for (int k = 0; k + 3 < erase.Length; k += 4)
       for (int y = Math.Max(0, erase[k + 1] - Y); y < Math.Min(H, erase[k + 1] + erase[k + 3] - Y); y++)
-        for (int x = Math.Max(0, erase[k] - X); x < Math.Min(W, erase[k] + erase[k + 2] - X); x++) { int i = y * W + x; if (Whiteish(i, 200, 40)) bg[i] = true; }
+        for (int x = Math.Max(0, erase[k] - X); x < Math.Min(W, erase[k] + erase[k + 2] - X); x++) { int i = y * W + x; if (Whiteish(i, 226, 24)) bg[i] = true; }
 
     // 2. enclosed white islands: big pure-white ones anywhere; any size inside the hair box
     var seen = new bool[N]; var reg = new List<int>();
@@ -48,22 +53,23 @@ public static class Cut2 {
         if (Mn(i) >= 251 && Sat(i) <= 3) pure++;
         int x = i % W + X, y = i / W + Y; if (x >= hx && x < hx + hw && y >= hy && y < hy + hh) inHair++;
         foreach (int j in N8(i)) if (!seen[j] && !bg[j] && Whiteish(j, 215, 30)) { seen[j] = true; q.Enqueue(j); } }
-      bool hair = inHair > reg.Count / 2;
-      if (hair) {
-        // only gaps between dark strands: the ring around the island must be dark and not skin
-        // (keeps the whites of the eyes, teeth and skin highlights)
-        // band: up to 3 pixels around the island
-        var depth = new Dictionary<int, int>(); var bq = new Queue<int>();
-        foreach (int i in reg) { depth[i] = 0; bq.Enqueue(i); }
-        int ring = 0, skin = 0;
-        while (bq.Count > 0) { int i = bq.Dequeue(); int dd = depth[i]; if (dd >= 3) continue;
-          foreach (int j in N8(i)) { if (depth.ContainsKey(j) || bg[j]) continue; depth[j] = dd + 1; bq.Enqueue(j);
-            if (Whiteish(j, 215, 30)) continue;
-            int oj = j * 4, r = px[oj + 2], g = px[oj + 1], b = px[oj]; ring++;
-            if (r > 150 && r > g + 12 && g > b - 5 && Mn(j) > 95) skin++; } }
-        hair = ring > 0 && skin < ring * 0.15;
-      }
-      if ((reg.Count >= 25 && pure > reg.Count * 0.6) || (hair && reg.Count >= 2)) foreach (int i in reg) bg[i] = true;
+      // what surrounds the island (a band up to 3 pixels wide) decides whether it is a see-through gap:
+      // gaps sit between dark things (hair strands, skirt folds); highlights sit on light surfaces
+      // (pale skin, the white shirt) and eyes / teeth sit in skin
+      var depth = new Dictionary<int, int>(); var bq = new Queue<int>();
+      foreach (int i in reg) { depth[i] = 0; bq.Enqueue(i); }
+      int ring = 0, skin = 0, dark = 0, light = 0;
+      while (bq.Count > 0) { int i = bq.Dequeue(); int dd = depth[i]; if (dd >= 3) continue;
+        foreach (int j in N8(i)) { if (depth.ContainsKey(j) || bg[j]) continue; depth[j] = dd + 1; bq.Enqueue(j);
+          if (Whiteish(j, 215, 30)) continue;
+          int oj = j * 4, r = px[oj + 2], g = px[oj + 1], b = px[oj]; ring++;
+          if (Mn(j) < 120) dark++; else if (Mn(j) > 150) light++;
+          if (r > 150 && r > g + 12 && g > b - 5 && Mn(j) > 95) skin++; } }
+      double darkF = ring > 0 ? dark / (double)ring : 0, lightF = ring > 0 ? light / (double)ring : 1;
+      bool pureIsland = pure > reg.Count * 0.6;
+      bool hair = inHair > reg.Count / 2 && ring > 0 && skin < ring * 0.15 && darkF > 0.5;
+      bool gap = pureIsland && (darkF > 0.4 || (reg.Count >= 25 && lightF < 0.7));
+      if (gap || (hair && reg.Count >= 2)) foreach (int i in reg) bg[i] = true;
     }
 
     // 3. keep only the figure (component containing the seed)

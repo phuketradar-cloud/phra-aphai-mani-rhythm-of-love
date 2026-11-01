@@ -1,11 +1,17 @@
 /*
  * PhiSueaSamut — the sea giantess (right side, faces left toward the prince).
  *
- * Layered skeletal 2D character drawn procedurally. Animation states:
- *   mesmerized | idle | slowWalk | fastWalk | running | attack | capture
+ * Drawn from painted sprites (assets/characters/phi_suea_samut/):
+ *   walk_0…7   — 8-frame walk cycle (idle, slowWalk, fastWalk, running)
+ *   mesmerized — eyes closed, hands at the heart (mesmerized)
+ *   run        — the leap at the start of an attack
+ *   attack     — roaring lunge with claws out (attack, capture)
+ * The walk frame follows the gait phase, so a foot lands on frames 0 and 4 exactly when
+ * onStep(intensity) fires (footstep sounds stay in sync and speed up as she accelerates); frames
+ * cross-fade at the end of each step. Every sprite is drawn as a bending mesh (PAM.SpriteMesh):
+ * hair streams and ripples, the skirt flutters, the body breathes and sways when enchanted.
+ * Until the images load the original procedural skeletal figure is drawn (drawRig).
  * Poses are blended every frame (PAM.Rig.blend) so state changes are smooth.
- * Walking uses a phase-driven gait with two-bone IK legs; onStep(intensity) fires when a foot
- * lands so footsteps stay in sync with the animation (and get faster as she accelerates).
  */
 window.PAM = window.PAM || {};
 PAM.PhiSueaSamut = class PhiSueaSamut {
@@ -21,9 +27,22 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     this.override = null;      // cinematic transform {dx, dy, rot}
     this.handsWorld = { x: 0, y: 0 };
     this.headWorld = { x: 0, y: 0 };
+    this.sprites = PAM.PhiSueaSamut.loadSprites();
+    this.stateT = 0;           // seconds in the current state
+    this.poseKey = 'mesmerized'; this.prevKey = null; this.fade = 1;
   }
 
-  setState(s) { this.state = s; }
+  /** Load the images once (shared by every instance). */
+  static loadSprites() {
+    if (PAM.PhiSueaSamut._sprites) return PAM.PhiSueaSamut._sprites;
+    const S = PAM.PhiSueaSamut.SPRITES, dir = 'assets/characters/phi_suea_samut/', v = '?v=1', set = {};
+    set.walk = [];
+    for (let i = 0; i < 8; i++) set.walk.push(PAM.SpriteMesh.load(`${dir}walk_${i}.png${v}`, S.walk));
+    for (const k of ['mesmerized', 'run', 'attack']) set[k] = PAM.SpriteMesh.load(`${dir}${k}.png${v}`, S[k]);
+    return (PAM.PhiSueaSamut._sprites = set);
+  }
+
+  setState(s) { if (s !== this.state) this.stateT = 0; this.state = s; }
   flinch() { this.flinchT = 0; }
 
   gait() {
@@ -61,7 +80,10 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
   }
 
   update(dt) {
-    this.t += dt; this.flinchT += dt;
+    this.t += dt; this.flinchT += dt; this.stateT += dt;
+    const key = this.poseFor();
+    if (key !== this.poseKey) { this.prevKey = this.poseKey; this.poseKey = key; this.fade = 0; }
+    this.fade = Math.min(1, this.fade + dt / (key === 'attack' || key === 'run' ? 0.12 : 0.3));
     const g = this.gait();
     const prev = this.phase;
     this.phase += g.speed * dt;
@@ -91,7 +113,130 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     return { x: this.x + x, y: this.y + y };
   }
 
+  /** Which painted pose the current state shows ('walk' = the walk cycle). */
+  poseFor() {
+    switch (this.state) {
+      case 'mesmerized': return 'mesmerized';
+      case 'attack': return this.stateT < 0.22 ? 'run' : 'attack';
+      case 'capture': return 'attack';
+      default: return 'walk';
+    }
+  }
+
   draw(ctx) {
+    const s = this.sprites;
+    if (s.walk.every(f => f.ok) && s.mesmerized.ok && s.run.ok && s.attack.ok) this.drawSprites(ctx); else this.drawRig(ctx);
+  }
+
+  /** Walk frame for the gait phase: frame 0 / 4 = a foot landing (phase 0 / π, when onStep fires). */
+  walkFrame() {
+    const f = ((this.phase / Math.PI * 4) % 8 + 8) % 8, i = Math.floor(f), frac = f - i;
+    // hold each frame, then cross-fade into the next during the last part of the step
+    const k = Math.max(0, Math.min(1, (frac - 0.5) / 0.5));
+    return { a: this.sprites.walk[i], b: this.sprites.walk[(i + 1) % 8], mix: k * k * (3 - 2 * k) };
+  }
+
+  /**
+   * Bend one image point (sprite pixels): the body breathes (and sways when enchanted), hair
+   * streams back and ripples in waves, and the skirt / sash flutter — more on the trailing side.
+   */
+  deform(sp, x, y) {
+    const p = this.pose, t = this.t, clamp = (v, a, z) => Math.max(a, Math.min(z, v));
+    const footY = sp.foot[1], cx = sp.foot[0], hip = sp.hip, head = sp.head;
+    const h = clamp((footY - y) / footY, 0, 1);
+    let dx = 0, dy = 0;
+    // enchanted sway: the upper body drifts slowly side to side above planted feet
+    dx += Math.sin(t * 1.3) * 9 * (p.eyesClosed || 0) * Math.pow(h, 1.5);
+    // breathing
+    const br = Math.sin(t * (2 + (p.glow || 0) * 2.5)) * 1.4;
+    const chest = clamp(1 - Math.abs(y - (head[1] + hip) / 2) / ((hip - head[1]) / 2 + 20), 0, 1);
+    dx += (x - cx) * 0.01 * br * chest; dy -= br * 1.5 * clamp((hip - y) / (hip - head[1]), 0, 1);
+    // hair: everything behind the head down to the hips streams back and ripples
+    const wind = 0.6 + (p.hairWind || 0.3);
+    const behind = clamp((x - head[0] - 18) / 90, 0, 1) * clamp((hip + 60 - y) / 120, 0, 1);
+    if (behind > 0) {
+      const far = clamp((x - head[0]) / 220, 0, 1.4);
+      dx += behind * (Math.sin(t * 2.7 + y * 0.028 - x * 0.012) * (3 + 7 * far) + far * 4 * (wind - 0.6)) * wind;
+      dy += behind * Math.cos(t * 2.3 + x * 0.03) * (2 + 4 * far) * wind;
+    }
+    // skirt and sash ends: below the hips, growing toward the hem and the trailing (right) side
+    const low = clamp((y - hip - 30) / 220, 0, 1) * clamp((footY - 35 - y) / 60, 0, 1);
+    if (low > 0) {
+      const trail = clamp((x - cx + 30) / 140, 0.2, 1.3);
+      dx += low * trail * Math.sin(t * 3.4 - y * 0.024 + x * 0.012) * 6 * wind;
+      dy += low * trail * Math.cos(t * 2.9 - x * 0.02) * 2.5 * wind;
+    }
+    return [x + dx, y + dy];
+  }
+
+  /** Painted sprites: walk cycle or pose, bent by deform(), leaning and bobbing as a whole. */
+  drawSprites(ctx) {
+    const p = this.pose, t = this.t, S = PAM.PhiSueaSamut.SPRITE_SCALE, set = this.sprites;
+    const st = p.stride || 0;
+    const lift = (p.bob || 0) + (p.crouch || 0) * 18 - Math.abs(Math.sin(this.phase)) * 7 * st;
+    const leanOf = key => key === 'walk' ? -(p.lean || 0) * 0.45 : key === 'mesmerized' ? -(p.sway || 0) * 0.4 : -(p.lean || 0) * 0.15;
+    const place = (key) => {
+      ctx.translate(this.x, this.y);
+      if (this.override) { ctx.translate(this.override.dx, this.override.dy); ctx.rotate(this.override.rot); }
+      ctx.scale(this.scale, this.scale);
+      ctx.translate(0, lift);
+      ctx.rotate(leanOf(key));
+      ctx.scale(S, S);
+    };
+    const drawOne = (sp, key, alpha) => {
+      if (!sp || alpha <= 0.01) return;
+      ctx.save(); place(key); ctx.globalAlpha *= alpha;
+      ctx.translate(-sp.foot[0], -sp.foot[1]);
+      PAM.SpriteMesh.draw(ctx, sp, (x, y) => this.deform(sp, x, y));
+      ctx.restore();
+    };
+    const drawKey = (key, alpha) => {
+      if (key === 'walk') { const w = this.walkFrame(); drawOne(w.a, key, alpha); drawOne(w.b, key, alpha * w.mix); }
+      else drawOne(set[key], key, alpha);
+    };
+
+    // contact shadow
+    ctx.save();
+    ctx.translate(this.x + (this.override ? this.override.dx : 0), this.y + (this.override ? this.override.dy : 0));
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(10, 4, 95 * this.scale, 15 * this.scale, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    if (this.fade < 1 && this.prevKey) drawKey(this.prevKey, 1 - this.fade);
+    drawKey(this.poseKey, this.fade < 1 ? this.fade : 1);
+
+    // world-space anchors (for music notes, sparkles and the capture)
+    const cur = this.poseKey === 'walk' ? set.walk[0] : set[this.poseKey], rot = leanOf(this.poseKey);
+    const toWorld = q0 => {
+      const q = this.deform(cur, q0[0], q0[1]);
+      let x = (q[0] - cur.foot[0]) * S, y = (q[1] - cur.foot[1]) * S;
+      const c0 = Math.cos(rot), s0 = Math.sin(rot);
+      [x, y] = [x * c0 - y * s0, x * s0 + y * c0 + lift];
+      x *= this.scale; y *= this.scale;
+      if (this.override) {
+        const c = Math.cos(this.override.rot), s = Math.sin(this.override.rot);
+        [x, y] = [x * c - y * s + this.override.dx, x * s + y * c + this.override.dy];
+      }
+      return { x: this.x + x, y: this.y + y };
+    };
+    this.handsWorld = toWorld(cur.hands);
+    this.headWorld = toWorld(cur.head);
+    this.chestWorld = toWorld(cur.chest);
+
+    // glowing red eyes when she hunts
+    const glow = Math.max(0, Math.min(1, ((p.glow || 0) - 0.45) * 1.4));
+    if (glow > 0 && cur.eye && this.poseKey !== 'mesmerized') {
+      const e = toWorld(cur.eye), r = 16 * this.scale;
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      const g = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, r);
+      g.addColorStop(0, `rgba(255,60,60,${0.55 * glow})`); g.addColorStop(1, 'rgba(255,40,40,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  /** Original procedural skeletal figure (fallback while the sprites load). */
+  drawRig(ctx) {
     const R = PAM.Rig, p = this.pose, t = this.t;
     ctx.save();
     ctx.translate(this.x, this.y);
@@ -371,4 +516,18 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     }
     ctx.restore();
   }
+};
+
+/** World units per sprite pixel (before this.scale). */
+PAM.PhiSueaSamut.SPRITE_SCALE = 0.72;
+/**
+ * Anchor points in sprite pixels: foot = ground point under the pelvis, hip = waist height,
+ * head / chest / hands / eye = what effects, the music notes and the capture aim at.
+ * All 8 walk frames share one canvas registered on the face, so they share their anchors.
+ */
+PAM.PhiSueaSamut.SPRITES = {
+  walk:       { foot: [110, 633], hip: 290, head: [100, 85], chest: [110, 190], hands: [85, 335], eye: [86, 92] },
+  mesmerized: { foot: [85, 625],  hip: 270, head: [65, 75],  chest: [80, 170],  hands: [55, 160] },
+  run:        { foot: [160, 568], hip: 260, head: [75, 85],  chest: [110, 185], hands: [15, 180], eye: [85, 98] },
+  attack:     { foot: [230, 548], hip: 250, head: [130, 80], chest: [180, 170], hands: [35, 140], eye: [110, 90] }
 };
