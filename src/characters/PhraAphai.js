@@ -76,7 +76,25 @@ PAM.PhraAphai = class PhraAphai {
     PAM.Rig.blend(this.pose, this.targetPose(), dt, fast ? 14 : 7);
     const key = this.spriteFor(this.state);
     if (key !== this.spriteKey) { this.prevKey = this.spriteKey; this.spriteKey = key; this.fade = 0; }
-    this.fade = Math.min(1, this.fade + dt / 0.18);
+    this.fade = Math.min(1, this.fade + dt / 0.25);
+    // motion style eases between states so nothing snaps
+    if (!this.motion) this.motion = this.targetMotion();
+    PAM.Rig.blend(this.motion, this.targetMotion(), dt, 4);
+    this.clock = (this.clock || 0) + dt;
+    // beat phase: from the song while it plays (Game sets this.beat), otherwise a gentle internal pulse
+    this.beatPhase = this.beat != null ? this.beat : this.clock * 0.9;
+  }
+
+  /** How much each part of the body moves in the current state (image pixels / radians). */
+  targetMotion() {
+    switch (this.state) {
+      case 'play':    return { sway: 9, dip: 5, nod: 0.05, breath: 0.8, breathRate: 2.2, wind: 1, tremble: 0, beatSway: 1 };
+      case 'nervous': return { sway: 6, dip: 3, nod: 0.03, breath: 1.2, breathRate: 3.4, wind: 1.1, tremble: 0.5, beatSway: 1 };
+      case 'panic':   return { sway: 4, dip: 1, nod: 0.02, breath: 1.8, breathRate: 6, wind: 1.4, tremble: 1.6, beatSway: 0 };
+      case 'caught':
+      case 'pulled':  return { sway: 6, dip: 0, nod: 0.06, breath: 2, breathRate: 7, wind: 1.8, tremble: 2.2, beatSway: 0 };
+      default:        return { sway: 4, dip: 0, nod: 0.02, breath: 1, breathRate: 1.6, wind: 0.7, tremble: 0, beatSway: 0 };
+    }
   }
 
   draw(ctx) {
@@ -84,13 +102,97 @@ PAM.PhraAphai = class PhraAphai {
     if (cur && cur.ok) this.drawSprites(ctx); else this.drawRig(ctx);
   }
 
-  /** Painted sprites: the whole figure sways, leans, breathes and trembles around its feet. */
+  /**
+   * Bend one image point (sprite pixels) for this frame. The feet stay planted while the body
+   * above them sways and dips on the beat, the chest breathes, the head nods around the neck,
+   * and the loose sash ends and hair ripple in the sea wind.
+   */
+  deform(sp, x, y) {
+    const m = this.motion, t = this.clock, b = this.beatPhase, clamp = (v, a, z) => Math.max(a, Math.min(z, v));
+    const footY = sp.foot[1], hip = sp.hip, neck = sp.neck, cx = sp.cx;
+    const h = clamp((footY - y) / footY, 0, 1);              // 0 at the feet, 1 at the top of the head
+    // sway: one side-to-side swing every two beats (or a slow drift when not playing)
+    const swing = m.beatSway * Math.sin(b * Math.PI) + (1 - m.beatSway) * Math.sin(t * 1.1);
+    let dx = m.sway * swing * Math.pow(h, 1.6);
+    // dip: knees give a little on each beat
+    const pulse = Math.pow(0.5 + 0.5 * Math.cos(b * Math.PI * 2), 3);
+    let dy = m.dip * pulse * h;
+    // breathing: chest widens and shoulders rise
+    const br = Math.sin(t * m.breathRate) * m.breath;
+    const chest = clamp(1 - Math.abs(y - (neck + hip) / 2) / ((hip - neck) / 2 + 25), 0, 1);
+    dx += (x - cx) * 0.012 * br * chest;
+    dy -= br * 1.6 * clamp((hip - y) / (hip - neck), 0, 1);
+    // head nod around the neck, on the beat
+    if (y < neck + 14) {
+      const w = clamp((neck + 14 - y) / 50, 0, 1), a = (m.nod * (pulse - 0.3) + Math.sin(t * 0.7) * 0.012) * w;
+      const rx = x - cx, ry = y - neck, c = Math.cos(a) - 1, s = Math.sin(a);
+      dx += rx * c - ry * s; dy += rx * s + ry * c;
+    }
+    // loose cloth: sash ends outside the legs, between the waist and the shins
+    const side = Math.abs(x - cx) - sp.bodyW;
+    if (side > 0 && y > hip - 20 && y < footY - 70) {
+      const w = clamp(side / 70, 0, 1) * clamp((y - hip + 20) / 110, 0, 1) * clamp((footY - 70 - y) / 60, 0, 1);
+      const ph = t * 3.1 - y * 0.035 + (x > cx ? 0 : 1.7);
+      dx += w * m.wind * Math.sin(ph) * 9; dy += w * m.wind * Math.cos(ph * 0.8) * 4;
+    }
+    // hair: strands around the head lift and flow
+    const hy = sp.head[1] + 30;
+    if (y < hy) {
+      const w = clamp((hy - y) / 70, 0, 1) * clamp((Math.abs(x - sp.head[0]) - 18) / 40, 0, 1);
+      dx += w * m.wind * Math.sin(t * 2.6 + y * 0.05) * 5; dy += w * m.wind * Math.cos(t * 2.2 + x * 0.04) * 2;
+    }
+    // fear: fine trembling that grows toward the shoulders
+    dx += m.tremble * Math.sin(t * 41 + y * 0.06) * h;
+    return [x + dx, y + dy];
+  }
+
+  /** Grid cells of each sprite that contain visible pixels (empty cells are skipped when drawing). */
+  meshFor(sp) {
+    if (sp.mesh) return sp.mesh;
+    const W = sp.img.naturalWidth, H = sp.img.naturalHeight, cols = 8, rows = 16, cells = [];
+    let data = null;
+    try {
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const g = c.getContext('2d'); g.drawImage(sp.img, 0, 0); data = g.getImageData(0, 0, W, H).data;
+    } catch (e) { /* unreadable image: draw every cell */ }
+    for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+      const x0 = Math.floor(q * W / cols), x1 = Math.floor((q + 1) * W / cols), y0 = Math.floor(r * H / rows), y1 = Math.floor((r + 1) * H / rows);
+      let used = !data;
+      for (let y = y0; y < y1 && !used; y += 2) for (let x = x0; x < x1; x += 2) if (data[(y * W + x) * 4 + 3] > 8) { used = true; break; }
+      if (used) cells.push([x0, y0, x1, y1]);
+    }
+    return (sp.mesh = cells);
+  }
+
+  /** Draw a sprite bent by deform(): each grid cell is split into two textured triangles. */
+  drawMesh(ctx, sp) {
+    const img = sp.img;
+    const tri = (u0, v0, u1, v1, u2, v2) => {
+      const [x0, y0] = this.deform(sp, u0, v0), [x1, y1] = this.deform(sp, u1, v1), [x2, y2] = this.deform(sp, u2, v2);
+      // grow the clip a little around the centroid so neighbouring triangles overlap (no seams)
+      const mx = (x0 + x1 + x2) / 3, my = (y0 + y1 + y2) / 3, grow = (x, y) => {
+        const l = Math.hypot(x - mx, y - my) || 1; return [x + (x - mx) / l * 0.9, y + (y - my) / l * 0.9];
+      };
+      const [a0, b0] = grow(x0, y0), [a1, b1] = grow(x1, y1), [a2, b2] = grow(x2, y2);
+      const den = (u1 - u0) * (v2 - v0) - (u2 - u0) * (v1 - v0);
+      if (!den) return;
+      const a = ((x1 - x0) * (v2 - v0) - (x2 - x0) * (v1 - v0)) / den, c = ((x2 - x0) * (u1 - u0) - (x1 - x0) * (u2 - u0)) / den;
+      const b = ((y1 - y0) * (v2 - v0) - (y2 - y0) * (v1 - v0)) / den, d = ((y2 - y0) * (u1 - u0) - (y1 - y0) * (u2 - u0)) / den;
+      ctx.save();
+      ctx.beginPath(); ctx.moveTo(a0, b0); ctx.lineTo(a1, b1); ctx.lineTo(a2, b2); ctx.closePath(); ctx.clip();
+      ctx.transform(a, b, c, d, x0 - a * u0 - c * v0, y0 - b * u0 - d * v0);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+    };
+    for (const [x0, y0, x1, y1] of this.meshFor(sp)) { tri(x0, y0, x1, y0, x1, y1); tri(x0, y0, x1, y1, x0, y1); }
+  }
+
+  /** Painted sprites, bent by deform() and leaned / trembled as a whole around the feet. */
   drawSprites(ctx) {
     const p = this.pose, t = this.t, S = PAM.PhraAphai.SPRITE_SCALE;
     const shake = p.shake ? Math.sin(t * 60) * p.shake : 0;
-    const rot = ((p.lean || 0) + (p.sway || 0)) * 0.55;
+    const rot = (p.lean || 0) * 0.55;
     const lift = (p.bob || 0) + (p.knee || 0) * 6;
-    const breathe = 1 + Math.sin(t * 2.1) * 0.006;
     // character-local frame: origin between the feet, before this.scale / override
     const place = () => {
       ctx.translate(this.x, this.y);
@@ -98,13 +200,14 @@ PAM.PhraAphai = class PhraAphai {
       ctx.scale(this.scale, this.scale);
       ctx.translate(shake, lift);
       ctx.rotate(rot);
-      ctx.scale(S, S * breathe);
+      ctx.scale(S, S);
     };
     const drawOne = (sp, alpha) => {
       if (!sp || !sp.ok || alpha <= 0) return;
       ctx.save(); place(); ctx.globalAlpha = alpha;
       if (sp.flip) ctx.scale(-1, 1);
-      ctx.drawImage(sp.img, -sp.foot[0], -sp.foot[1]);
+      ctx.translate(-sp.foot[0], -sp.foot[1]);
+      this.drawMesh(ctx, sp);
       ctx.restore();
     };
     // soft contact shadow
@@ -119,8 +222,9 @@ PAM.PhraAphai = class PhraAphai {
     drawOne(cur, this.fade < 1 ? this.fade : 1);
 
     // world-space anchors for effects / the giantess
-    const toWorld = q => {
-      let x = (cur.flip ? cur.foot[0] - q[0] : q[0] - cur.foot[0]) * S, y = (q[1] - cur.foot[1]) * S * breathe;
+    const toWorld = q0 => {
+      const q = this.deform(cur, q0[0], q0[1]);
+      let x = (cur.flip ? cur.foot[0] - q[0] : q[0] - cur.foot[0]) * S, y = (q[1] - cur.foot[1]) * S;
       const c0 = Math.cos(rot), s0 = Math.sin(rot);
       [x, y] = [x * c0 - y * s0 + shake, x * s0 + y * c0 + lift];
       x *= this.scale; y *= this.scale;
@@ -335,11 +439,12 @@ PAM.PhraAphai = class PhraAphai {
 PAM.PhraAphai.SPRITE_SCALE = 0.5;
 /**
  * Pose images and their anchor points in image pixels:
- * foot = ground point between the feet, flute = where music notes leave, chest = what the
+ * foot = ground point between the feet, hip / neck = waist and neck heights, cx = body centre line,
+ * bodyW = half-width of the legs (sash ends beyond it flutter), flute = where music notes leave, chest = what the
  * giantess grabs, head = head centre. flip mirrors the image so he faces right (the sea).
  */
 PAM.PhraAphai.SPRITES = {
-  idle:   { src: 'assets/characters/phra_aphai/idle.png?v=1',   foot: [113, 600], flute: [179, 172], chest: [95, 150],  head: [105, 60], flip: true },
-  play:   { src: 'assets/characters/phra_aphai/play.png?v=1',   foot: [128, 596], flute: [226, 107], chest: [111, 150], head: [131, 60] },
-  scared: { src: 'assets/characters/phra_aphai/scared.png?v=1', foot: [150, 581], flute: [16, 240],  chest: [114, 150], head: [104, 60] }
+  idle:   { src: 'assets/characters/phra_aphai/idle.png?v=1',   foot: [113, 600], flute: [179, 172], chest: [95, 150],  head: [105, 60], hip: 215, neck: 100, cx: 110, bodyW: 48, flip: true },
+  play:   { src: 'assets/characters/phra_aphai/play.png?v=1',   foot: [128, 596], flute: [226, 107], chest: [111, 150], head: [131, 60], hip: 222, neck: 105, cx: 118, bodyW: 50 },
+  scared: { src: 'assets/characters/phra_aphai/scared.png?v=1', foot: [150, 581], flute: [16, 240],  chest: [114, 150], head: [104, 60], hip: 222, neck: 100, cx: 150, bodyW: 62 }
 };

@@ -375,7 +375,7 @@ PAM.Game = class Game {
   // =================================================================== run lifecycle
   resetScene() {
     this.prince.override = null; this.giant.override = null;
-    this.prince.scale = PRINCE_SCALE; this.giant.scale = GIANT_SCALE;
+    this.prince.scale = PRINCE_SCALE; this.giant.scale = GIANT_SCALE; this.prince.beat = null;
     this.prince.setState(this.state === this.S.MENU ? 'play' : 'idle');
     this.giant.setState('mesmerized');
     this.pursuit.reset(PAM.DifficultyManager.get(this.settings.difficulty));
@@ -623,6 +623,8 @@ PAM.Game = class Game {
     this.giant.reachTarget = this.prince.bodyCenter;
     const d = this.pursuit.danger;
     this.prince.setState(d > 0.78 ? 'panic' : d > 0.5 ? 'nervous' : 'play');
+    const bm = this.beatmap;   // the prince sways and nods on the song's felt beat
+    this.prince.beat = bm ? (t - (bm.offset || 0)) * (bm.feltBpm || bm.bpm || 100) / 60 : null;
     if (this.pursuit.mood === 'mesmerized' && Math.random() < dt * 4) this.fx.sparkle(this.giant.headWorld.x, this.giant.headWorld.y + 140, '#bfe9ff');
 
     // heartbeat warning when she is close
