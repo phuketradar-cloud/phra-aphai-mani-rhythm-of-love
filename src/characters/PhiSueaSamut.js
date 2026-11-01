@@ -102,8 +102,13 @@ PAM.PhiSueaSamut = class PhiSueaSamut {
     if (key === 'walk' && this.drawsSprites) {
       // painted walk: steps come from the distance actually walked, so planted feet never slide;
       // pushed back by the music she steps backwards. Standing still she settles onto both feet.
+      // While she hunts, the stride never drops below a brisk cadence for her mood (the chase is
+      // slow, so this trades a little foot slide for urgency).
       const stepWorld = PAM.PhiSueaSamut.SPRITES.walk.step * PAM.PhiSueaSamut.SPRITE_SCALE * this.scale;
-      if (Math.abs(moved) > 0.02) this.phase += moved / stepWorld * Math.PI;
+      const cadence = PAM.PhiSueaSamut.CADENCE[this.state] || 0;   // radians / second
+      const walked = moved / stepWorld * Math.PI;
+      if (moved > 0.02 && cadence) this.phase += Math.max(walked, cadence * dt);
+      else if (Math.abs(moved) > 0.02) this.phase += walked;
       else this.phase += (Math.round(this.phase / Math.PI) * Math.PI - this.phase) * Math.min(1, dt * 5);
     } else {
       this.phase += g.speed * dt;
@@ -562,3 +567,5 @@ PAM.PhiSueaSamut.SPRITES = {
   run:        { foot: [160, 568], hip: 260, head: [75, 85],  chest: [110, 185], hands: [15, 180], eye: [85, 98] },
   attack:     { foot: [230, 548], hip: 250, head: [130, 80], chest: [180, 170], hands: [35, 140], eye: [110, 90] }
 };
+/** Minimum walk-cycle speed while moving forward, per state (radians/second; π = one step). */
+PAM.PhiSueaSamut.CADENCE = { slowWalk: 3.0, fastWalk: 4.6, running: 6.8 };
